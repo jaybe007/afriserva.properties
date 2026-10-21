@@ -1,5 +1,4 @@
 -- Migration: Saved Properties / Wishlist Table
-USE afriserva_properties;
 
 CREATE TABLE IF NOT EXISTS saved_properties (
     id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

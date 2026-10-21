@@ -24,22 +24,30 @@ class HomeController extends Controller
         $topAgents = User::getAgents(4);
         $topAgencies = User::getAgencies(3);
 
-        $marketArticles = Database::query(
-            "SELECT * FROM market_articles WHERE is_published = 1 ORDER BY published_at DESC LIMIT 3"
-        );
+        try {
+            $marketArticles = Database::query(
+                "SELECT * FROM market_articles WHERE is_published = 1 ORDER BY published_at DESC LIMIT 3"
+            );
+        } catch (\Throwable $e) {
+            $marketArticles = [];
+        }
 
-        $reviews = Database::query(
-            "SELECT r.*, u.full_name, u.avatar_url, 
-                    p.title AS property_title, p.slug AS property_slug,
-                    ag.full_name AS reviewed_agent_name
-             FROM reviews r
-             JOIN users u ON u.id = r.user_id
-             LEFT JOIN properties p ON (r.reviewable_type = 'property' AND p.id = r.reviewable_id)
-             LEFT JOIN users ag ON (r.reviewable_type = 'agent' AND ag.id = r.reviewable_id)
-             WHERE r.is_approved = 1
-             ORDER BY r.created_at DESC
-             LIMIT 3"
-        );
+        try {
+            $reviews = Database::query(
+                "SELECT r.*, u.full_name, u.avatar_url, 
+                        p.title AS property_title, p.slug AS property_slug,
+                        ag.full_name AS reviewed_agent_name
+                 FROM reviews r
+                 JOIN users u ON u.id = r.user_id
+                 LEFT JOIN properties p ON (r.reviewable_type = 'property' AND p.id = r.reviewable_id)
+                 LEFT JOIN users ag ON (r.reviewable_type = 'agent' AND ag.id = r.reviewable_id)
+                 WHERE r.is_approved = 1
+                 ORDER BY r.created_at DESC
+                 LIMIT 3"
+            );
+        } catch (\Throwable $e) {
+            $reviews = [];
+        }
 
         $categories = Database::query(
             "SELECT pc.*, COUNT(p.id) AS property_count 

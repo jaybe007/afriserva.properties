@@ -1,5 +1,4 @@
 -- Migration 007: Local Government Areas (LGAs) & Location Completeness
-USE afriserva_properties;
 
 -- Populate key Nigerian Local Government Areas (LGAs)
 -- Lagos State (state_id = 1)

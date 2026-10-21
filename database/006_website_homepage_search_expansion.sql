@@ -1,5 +1,4 @@
 -- Migration 006: Website Homepage & Real Estate Guides Expansion
-USE afriserva_properties;
 
 -- 1. Newsletter Subscribers Table
 CREATE TABLE IF NOT EXISTS newsletter_subscribers (

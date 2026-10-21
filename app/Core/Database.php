@@ -96,31 +96,46 @@ class Database
     {
         try {
             $pdo = self::connect();
-            $check = $pdo->query("SHOW TABLES LIKE 'properties'")->fetch();
-            if (!$check) {
-                $schemaFile = __DIR__ . '/../../database/schema.sql';
-                if (file_exists($schemaFile)) {
-                    $sql = file_get_contents($schemaFile);
-                    try {
-                        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
-                        $pdo->exec($sql);
-                    } catch (\Throwable $t) {
-                        // Split statements on semicolon if batch exec fails
-                        $statements = array_filter(array_map('trim', explode(';', $sql)));
-                        foreach ($statements as $stmt) {
-                            if (!empty($stmt)) {
-                                try {
-                                    $pdo->exec($stmt);
-                                } catch (\Throwable $st) {
-                                    // Continue with next statement
-                                }
-                            }
-                        }
-                    } finally {
-                        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+
+            // 1. Base schema: create foundational tables if properties table is absent
+            $hasProperties = $pdo->query("SHOW TABLES LIKE 'properties'")->fetch();
+            if (!$hasProperties) {
+                self::executeSqlFile($pdo, __DIR__ . '/../../database/schema.sql');
+            }
+
+            // 2. Incremental migrations: ensure market_articles and subsequent modules exist
+            $hasMarketArticles = $pdo->query("SHOW TABLES LIKE 'market_articles'")->fetch();
+            if (!$hasMarketArticles) {
+                $migrationFiles = [
+                    __DIR__ . '/../../database/migrations/003_resolve_oversights.sql',
+                    __DIR__ . '/../../database/migrations/004_all_states_and_international.sql',
+                    __DIR__ . '/../../database/migrations/004_part2.sql',
+                    __DIR__ . '/../../database/005_saved_properties.sql',
+                    __DIR__ . '/../../database/006_website_homepage_search_expansion.sql',
+                    __DIR__ . '/../../database/007_lgas_and_lead_crm.sql',
+                    __DIR__ . '/../../database/008_auth_dashboard_admin_verification.sql',
+                    __DIR__ . '/../../database/009_oversights_resolution.sql',
+                    __DIR__ . '/../../database/010_messaging_monetization_rentals.sql',
+                    __DIR__ . '/../../database/011_database_architecture_and_security.sql',
+                    __DIR__ . '/../../database/012_notifications_and_seo.sql',
+                ];
+
+                try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;"); } catch (\Throwable $e) {}
+                foreach ($migrationFiles as $file) {
+                    if (file_exists($file)) {
+                        self::executeSqlFile($pdo, $file);
                     }
                 }
+                try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); } catch (\Throwable $e) {}
+            }
 
+            // 3. Seed baseline records if properties table is empty
+            $propCount = 0;
+            try {
+                $propCount = (int)$pdo->query("SELECT COUNT(*) FROM properties")->fetchColumn();
+            } catch (\Throwable $e) {}
+
+            if ($propCount === 0) {
                 $seederFile = __DIR__ . '/../../database/seeds/DatabaseSeeder.php';
                 if (file_exists($seederFile)) {
                     require_once $seederFile;
@@ -135,7 +150,56 @@ class Database
                 }
             }
         } catch (\Throwable $e) {
-            error_log("Database initialization notice: " . $e->getMessage());
+            error_log("Database auto-migration notice: " . $e->getMessage());
+        }
+    }
+
+    public static function executeSqlFile(PDO $pdo, string $filePath): void
+    {
+        if (!file_exists($filePath)) {
+            return;
+        }
+
+        $sql = file_get_contents($filePath);
+        if (trim($sql) === '') {
+            return;
+        }
+
+        // Try direct block execution first
+        try {
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $pdo->exec($sql);
+            return;
+        } catch (\Throwable $t) {
+            // Fall back to statement-by-statement execution
+        } finally {
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        }
+
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+        $buffer = '';
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '' || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*')) {
+                continue;
+            }
+            $buffer .= ' ' . $trimmed;
+            if (str_ends_with($trimmed, ';')) {
+                $stmt = trim($buffer);
+                $buffer = '';
+                if ($stmt !== '' && $stmt !== ';') {
+                    // Compatibility for MySQL 8 without ADD COLUMN IF NOT EXISTS
+                    if (stripos($stmt, 'ALTER TABLE') !== false && stripos($stmt, 'IF NOT EXISTS') !== false) {
+                        $stmt = preg_replace('/ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS/i', 'ADD COLUMN', $stmt);
+                        $stmt = preg_replace('/ADD\s+IF\s+NOT\s+EXISTS/i', 'ADD', $stmt);
+                    }
+                    try {
+                        $pdo->exec($stmt);
+                    } catch (\Throwable $qe) {
+                        // Tolerate already-existing columns/tables
+                    }
+                }
+            }
         }
     }
 }
