@@ -3,6 +3,7 @@ Options -Indexes
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
     # Deny direct access to critical environment, source, and log files
     RewriteRule ^\.env.*$ - [F,L]
