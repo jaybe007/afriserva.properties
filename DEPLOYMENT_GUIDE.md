@@ -138,15 +138,25 @@ server {
 ```
 
 ### Option B: Apache 2.4+ / Shared Hosting (`.htaccess`)
-The included `public/.htaccess` file routes all requests through `index.php`:
-```apache
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.php [QSA,L]
-</IfModule>
-```
+The project includes a root `.htaccess` and `public/.htaccess` to securely route requests while blocking access to `.env`, `storage/logs/`, and source directories.
+
+### Option C: cPanel Git™ Version Control (Automated Pull & Deploy)
+
+1. **Log in to cPanel** &rarr; Navigate to **Files** &rarr; **Git™ Version Control**.
+2. Click **Create** (Blue button at top right).
+3. Configure the repository settings:
+   - **Clone a Repository**: Toggle ON
+   - **Clone URL**: `https://github.com/jaybe007/afriserva.properties.git`
+   - **Repository Path**: `repositories/properties` (or `public_html` if deploying root directory)
+   - **Repository Name**: `afriserva.properties`
+4. Click **Create**.
+5. Once cloned, navigate to the **Manage** tab:
+   - Under **Pull or Deploy**, click **Update from Remote** to pull latest changes.
+   - Click **Deploy HEAD Commit** (executes automated tasks defined in `.cpanel.yml`).
+6. **Set up Production `.env`**:
+   - In cPanel File Manager, create `.env` in the project root by copying `.env.example`.
+   - Update database credentials (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) from your cPanel MySQL Wizard.
+   - Set `APP_URL=https://afriserva.com` and `APP_ENV=production`.
 
 ---
 

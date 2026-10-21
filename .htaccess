@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Deny direct access to critical environment, source, and log files
+    RewriteRule ^\.env.*$ - [F,L]
+    RewriteRule ^\.git.*$ - [F,L]
+    RewriteRule ^app/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^storage/logs/ - [F,L]
+    RewriteRule ^storage/cache/ - [F,L]
+    RewriteRule ^tests/ - [F,L]
+    RewriteRule ^bin/ - [F,L]
+    RewriteRule ^composer\.(json|lock|phar)$ - [F,L]
+
+    # Seamlessly route incoming web requests through public/ directory
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^$ public/index.php [L]
+</IfModule>
