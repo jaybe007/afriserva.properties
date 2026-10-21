@@ -91,4 +91,51 @@ class Database
             throw $e;
         }
     }
+
+    public static function autoMigrateIfEmpty(): void
+    {
+        try {
+            $pdo = self::connect();
+            $check = $pdo->query("SHOW TABLES LIKE 'properties'")->fetch();
+            if (!$check) {
+                $schemaFile = __DIR__ . '/../../database/schema.sql';
+                if (file_exists($schemaFile)) {
+                    $sql = file_get_contents($schemaFile);
+                    try {
+                        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+                        $pdo->exec($sql);
+                    } catch (\Throwable $t) {
+                        // Split statements on semicolon if batch exec fails
+                        $statements = array_filter(array_map('trim', explode(';', $sql)));
+                        foreach ($statements as $stmt) {
+                            if (!empty($stmt)) {
+                                try {
+                                    $pdo->exec($stmt);
+                                } catch (\Throwable $st) {
+                                    // Continue with next statement
+                                }
+                            }
+                        }
+                    } finally {
+                        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                    }
+                }
+
+                $seederFile = __DIR__ . '/../../database/seeds/DatabaseSeeder.php';
+                if (file_exists($seederFile)) {
+                    require_once $seederFile;
+                    ob_start();
+                    try {
+                        $seeder = new \Database\Seeds\DatabaseSeeder($pdo);
+                        $seeder->run();
+                    } catch (\Throwable $se) {
+                        error_log("Database Seeding notice: " . $se->getMessage());
+                    }
+                    ob_end_clean();
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log("Database initialization notice: " . $e->getMessage());
+        }
+    }
 }

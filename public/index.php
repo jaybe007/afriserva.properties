@@ -70,6 +70,7 @@ use App\Middlewares\SecurityHeadersMiddleware;
 
 Session::start();
 SecurityHeadersMiddleware::apply();
+\App\Core\Database::autoMigrateIfEmpty();
 
 $request = new Request();
 $response = new Response();
