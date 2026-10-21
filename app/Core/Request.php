@@ -20,12 +20,12 @@ class Request
         $this->files = $_FILES;
 
         // Strip query string and base directory prefix from path
-        $parsedUrl = parse_url($this->uri, PHP_URL_PATH);
-        $scriptName = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+        $parsedUrl = parse_url($this->uri, PHP_URL_PATH) ?? '/';
+        $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
         
         $path = $parsedUrl;
-        if ($scriptName !== '/' && $scriptName !== '\\' && str_starts_with($path, $scriptName)) {
-            $path = substr($path, strlen($scriptName));
+        if ($scriptDir !== '/' && $scriptDir !== '.' && $scriptDir !== '' && str_starts_with($path, $scriptDir)) {
+            $path = substr($path, strlen($scriptDir));
         }
         $this->path = '/' . trim($path, '/');
 
