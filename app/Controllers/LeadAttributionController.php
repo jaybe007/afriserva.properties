@@ -39,7 +39,7 @@ class LeadAttributionController extends Controller
         // Record lead attribution in database to avoid platform leakage
         Database::execute(
             "INSERT INTO enquiries (property_id, user_id, agent_id, name, email, phone, message, enquiry_type, status, created_at)
-             VALUES (?, ?, ?, 'WhatsApp Visitor', 'unspecified@lead.afriserva.com', ?, ?, 'pricing_inquiry', 'contacted', NOW())",
+             VALUES (?, ?, ?, 'WhatsApp Visitor', 'unspecified@lead.afriserva.net', ?, ?, 'pricing_inquiry', 'contacted', NOW())",
             [
                 $propertyId,
                 $userId,
@@ -49,7 +49,7 @@ class LeadAttributionController extends Controller
             ]
         );
 
-        $text = urlencode("Hello, I am contacting you from Afriserva Real Estate (afriserva.org) regarding your listing: {$prop['title']} (Listing Ref: {$prop['reference_code']}). Is this property still available for inspection?");
+        $text = urlencode("Hello, I am contacting you from Afriserva Real Estate (afriserva.net) regarding your listing: {$prop['title']} (Listing Ref: {$prop['reference_code']}). Is this property still available for inspection?");
         $whatsappUrl = "https://wa.me/{$phoneDigits}?text={$text}";
 
         $this->redirect($response, $whatsappUrl);

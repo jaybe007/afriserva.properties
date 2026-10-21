@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-Proprietary-gold.svg)](#)
 
 - **Brand Name**: **Afriserva Real Estate**
-- **Main Website**: [afriserva.org](https://afriserva.org)
+- **Main Website**: [afriserva.net](https://afriserva.net)
 - **Corporate Entity**: **Cloud Current International Limited**
 - **Company Website**: [cloudcurrentng.com](https://cloudcurrentng.com)
 
@@ -29,10 +29,10 @@ All demo user accounts are pre-seeded with password: `Password123!`
 
 | Role / Persona | Email Address | Access Level & Capabilities |
 | :--- | :--- | :--- |
-| **Super Administrator** | `admin@afriserva.com` | Root system control, listing moderation, user management, global settings |
-| **Compliance Moderator** | `moderator@afriserva.com` | Listing document verification, review queues, legal title auditing |
+| **Super Administrator** | `admin@afriserva.net` | Root system control, listing moderation, user management, global settings |
+| **Compliance Moderator** | `moderator@afriserva.net` | Listing document verification, review queues, legal title auditing |
 | **Elite Agent** | `chioma@prestigeprime.ng` | Luxury portfolio listings, inbound client CRM leads, inspection scheduler |
-| **Abuja Diplomatic Agent**| `musa.danjuma@afriserva.com`| Diplomatic zone estates, viewing appointments, WhatsApp integrations |
+| **Abuja Diplomatic Agent**| `musa.danjuma@afriserva.net`| Diplomatic zone estates, viewing appointments, WhatsApp integrations |
 | **Agency Principal** | `balogun@prestigeprime.ng` | Corporate brokerage branding, team members, enterprise subscription |
 | **Private Landlord** | `emeka.nnamani@example.com` | Direct residential listings, rental management |
 | **Client / Investor** | `zainab.aliyu@example.com` | Property discovery, inspection tour bookings, inquiry dispatches |

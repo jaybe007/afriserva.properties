@@ -8,7 +8,7 @@ export function initPropertyMap(containerId = 'map-container', apiUrl = '/api/pr
     const map = L.map(containerId).setView([6.4549, 3.4246], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors | Afriserva Real Estate (afriserva.org)',
+        attribution: '&copy; OpenStreetMap contributors | Afriserva Real Estate (afriserva.net)',
         maxZoom: 19
     }).addTo(map);
 

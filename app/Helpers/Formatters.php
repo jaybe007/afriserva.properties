@@ -86,7 +86,7 @@ if (!function_exists('config')) {
             $settings = [
                 'app.name' => getenv('APP_NAME') ?: 'Afriserva Real Estate',
                 'brand.name' => getenv('BRAND_NAME') ?: 'Afriserva Real Estate',
-                'main.website' => getenv('MAIN_WEBSITE') ?: 'https://afriserva.org',
+                'main.website' => getenv('MAIN_WEBSITE') ?: 'https://afriserva.net',
                 'company.name' => getenv('COMPANY_NAME') ?: 'Cloud Current International Limited',
                 'company.website' => getenv('COMPANY_WEBSITE') ?: 'https://cloudcurrentng.com',
                 'app.url' => rtrim(getenv('APP_URL') ?: 'http://localhost/properties/public', '/'),

@@ -16,7 +16,7 @@
   "publisher": {
     "@type": "Organization",
     "name": "Afriserva Real Estate",
-    "url": "https://afriserva.org",
+    "url": "https://afriserva.net",
     "parentOrganization": {
       "@type": "Organization",
       "name": "Cloud Current International Limited",
