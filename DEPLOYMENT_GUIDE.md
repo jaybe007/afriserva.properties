@@ -1,5 +1,5 @@
 # Afriserva Real Estate: Production Deployment & Operations Manual
-**Brand**: Afriserva Real Estate ([afriserva.net](https://afriserva.net))  
+**Brand**: Afriserva Real Estate ([afriserva.com](https://afriserva.com))  
 **Operating Entity**: Cloud Current International Limited ([cloudcurrentng.com](https://cloudcurrentng.com))
 
 ---
@@ -79,21 +79,21 @@ sudo chmod 600 /var/www/afriserva/.env
 server {
     listen 80;
     listen [::]:80;
-    server_name afriserva.net www.afriserva.net;
+    server_name afriserva.com www.afriserva.com;
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name afriserva.net www.afriserva.net;
+    server_name afriserva.com www.afriserva.com;
 
     # Document root points strictly to public directory
     root /var/www/afriserva/public;
     index index.php index.html;
 
-    ssl_certificate /etc/letsencrypt/live/afriserva.net/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/afriserva.net/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/afriserva.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/afriserva.com/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -188,7 +188,7 @@ Configure crontab for `www-data` user (`sudo crontab -u www-data -e`):
 ### Shared-Hosting Webhook Cron Alternative
 For hosting environments without SSH access, trigger tasks via HTTP with the secure token:
 ```bash
-curl -s -X GET "https://afriserva.net/cron/run?token=YOUR_CRON_SECRET_KEY" > /dev/null
+curl -s -X GET "https://afriserva.com/cron/run?token=YOUR_CRON_SECRET_KEY" > /dev/null
 ```
 
 ---
@@ -199,8 +199,8 @@ Configure the following live webhook URLs in your payment merchant portals:
 
 | Gateway | Merchant Console Setting | Webhook Target URL | Required Signature Secret |
 | :--- | :--- | :--- | :--- |
-| **Paystack** | Settings &rarr; Preferences &rarr; Webhooks | `https://afriserva.net/webhook/paystack` | Verified via `X-Paystack-Signature` (HMAC SHA-512) |
-| **Flutterwave** | Settings &rarr; Webhooks | `https://afriserva.net/webhook/flutterwave` | Verified via `verif-hash` header |
+| **Paystack** | Settings &rarr; Preferences &rarr; Webhooks | `https://afriserva.com/webhook/paystack` | Verified via `X-Paystack-Signature` (HMAC SHA-512) |
+| **Flutterwave** | Settings &rarr; Webhooks | `https://afriserva.com/webhook/flutterwave` | Verified via `verif-hash` header |
 
 ---
 

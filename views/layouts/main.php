@@ -23,7 +23,7 @@
       "@context": "https://schema.org",
       "@type": "RealEstateAgent",
       "name": "Afriserva Real Estate",
-      "url": "https://afriserva.net",
+      "url": "https://afriserva.com",
       "logo": "<?= e(url('/assets/images/logo.png')) ?>",
       "description": "Nigeria's premier institutional real estate marketplace and property asset management ecosystem.",
       "parentOrganization": {
@@ -194,12 +194,12 @@
                         </div>
                     </div>
                     <p style="font-size: 14px; line-height: 1.7; color: #94A3B8; margin-bottom: 20px;">
-                        Nigeria’s premier institutional real estate marketplace and proptech ecosystem. Operated by <a href="https://cloudcurrentng.com" target="_blank" rel="noopener" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">Cloud Current International Limited</a>. Part of the <a href="https://afriserva.net" target="_blank" rel="noopener" style="color: #FFFFFF; font-weight: 600; text-decoration: none;">Afriserva</a> ecosystem. Connecting verified property owners, licensed brokerages, and prospective investors across Lagos, Abuja, Port Harcourt, and international diaspora markets.
+                        Nigeria’s premier institutional real estate marketplace and proptech ecosystem. Operated by <a href="https://cloudcurrentng.com" target="_blank" rel="noopener" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">Cloud Current International Limited</a>. Part of the <a href="https://afriserva.com" target="_blank" rel="noopener" style="color: #FFFFFF; font-weight: 600; text-decoration: none;">Afriserva</a> ecosystem. Connecting verified property owners, licensed brokerages, and prospective investors across Lagos, Abuja, Port Harcourt, and international diaspora markets.
                     </p>
                     <div style="font-size: 13px; color: #CBD5E1; line-height: 1.8;">
-                        <p><strong>Main Website:</strong> <a href="https://afriserva.net" target="_blank" rel="noopener" style="color: var(--color-accent); text-decoration: none; font-weight: 600;">afriserva.net</a></p>
+                        <p><strong>Main Website:</strong> <a href="https://afriserva.com" target="_blank" rel="noopener" style="color: var(--color-accent); text-decoration: none; font-weight: 600;">afriserva.com</a></p>
                         <p><strong>Corporate Operator:</strong> <a href="https://cloudcurrentng.com" target="_blank" rel="noopener" style="color: #CBD5E1; text-decoration: none;">Cloud Current International Limited (cloudcurrentng.com)</a></p>
-                        <p><strong>Hotline:</strong> +234 1 800 2374 &bull; <strong>Support:</strong> support@afriserva.net</p>
+                        <p><strong>Hotline:</strong> +234 1 800 2374 &bull; <strong>Support:</strong> support@afriserva.com</p>
                         <p><strong>Corporate HQ:</strong> Heritage Towers, Victoria Island, Lagos, Nigeria</p>
                     </div>
                 </div>
@@ -246,7 +246,7 @@
                     &copy; <?= date('Y') ?> <strong>Afriserva Real Estate</strong> &bull; Operated by <strong><a href="https://cloudcurrentng.com" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;">Cloud Current International Limited</a></strong>. All rights reserved.
                 </div>
                 <div>
-                    <a href="https://afriserva.net" target="_blank" rel="noopener" style="color: var(--color-accent); margin-right: 16px; font-weight: 600; text-decoration: none;">afriserva.net</a>
+                    <a href="https://afriserva.com" target="_blank" rel="noopener" style="color: var(--color-accent); margin-right: 16px; font-weight: 600; text-decoration: none;">afriserva.com</a>
                     <a href="https://cloudcurrentng.com" target="_blank" rel="noopener" style="color: #94A3B8; margin-right: 16px; text-decoration: none;">cloudcurrentng.com</a>
                     <span style="margin-right: 16px;">Terms of Advisory</span>
                     <span style="margin-right: 16px;">Privacy Policy</span>

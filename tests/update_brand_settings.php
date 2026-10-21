@@ -12,8 +12,8 @@ $settings = [
     ['key' => 'brand_name', 'value' => 'Afriserva Real Estate', 'group' => 'general', 'description' => 'Official trading brand'],
     ['key' => 'company_name', 'value' => 'Cloud Current International Limited', 'group' => 'general', 'description' => 'Operating and parent corporation'],
     ['key' => 'company_website', 'value' => 'https://cloudcurrentng.com', 'group' => 'general', 'description' => 'Operating company website'],
-    ['key' => 'main_website', 'value' => 'https://afriserva.net', 'group' => 'general', 'description' => 'Main portal and ecosystem website'],
-    ['key' => 'contact_email', 'value' => 'support@afriserva.net', 'group' => 'contact', 'description' => 'Primary corporate email address']
+    ['key' => 'main_website', 'value' => 'https://afriserva.com', 'group' => 'general', 'description' => 'Main portal and ecosystem website'],
+    ['key' => 'contact_email', 'value' => 'support@afriserva.com', 'group' => 'contact', 'description' => 'Primary corporate email address']
 ];
 
 $stmt = $db->prepare("INSERT INTO system_settings (`key`, `value`, `group`, description) VALUES (?, ?, ?, ?)

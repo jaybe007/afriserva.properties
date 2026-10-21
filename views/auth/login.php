@@ -46,7 +46,7 @@
                 ⚡ Fast Demo Persona Login (Password: <code>Password123!</code>)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('admin@afriserva.net')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('admin@afriserva.com')">
                     👑 Super Admin
                 </button>
                 <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('chioma@prestigeprime.ng')">

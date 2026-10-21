@@ -12,7 +12,7 @@
         <div>
             <div style="font-size: 26px; font-weight: 800; color: #0F172A;">AFRISERVA REAL ESTATE</div>
             <div style="font-size: 12px; color: #64748B; margin-top: 4px;">Operated by Cloud Current International Limited • cloudcurrentng.com</div>
-            <div style="font-size: 12px; color: #64748B;">Lagos, Nigeria • billing@afriserva.net • afriserva.net</div>
+            <div style="font-size: 12px; color: #64748B;">Lagos, Nigeria • billing@afriserva.com • afriserva.com</div>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 22px; font-weight: 800; color: #1E3A8A;">TAX INVOICE / RECEIPT</div>

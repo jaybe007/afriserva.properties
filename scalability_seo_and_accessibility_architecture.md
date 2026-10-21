@@ -1,5 +1,5 @@
 # Afriserva Real Estate: Performance, Scalability, SEO, Notifications & Accessibility Architecture
-**Brand**: Afriserva Real Estate ([afriserva.net](https://afriserva.net))  
+**Brand**: Afriserva Real Estate ([afriserva.com](https://afriserva.com))  
 **Operating Entity**: Cloud Current International Limited ([cloudcurrentng.com](https://cloudcurrentng.com))
 
 ---

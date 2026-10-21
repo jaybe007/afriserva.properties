@@ -246,7 +246,7 @@ class DatabaseSeeder
         $settings = [
             ['key' => 'app_name', 'value' => 'Afriserva Properties', 'group' => 'general', 'description' => 'Platform display name'],
             ['key' => 'app_tagline', 'value' => 'Nigeria’s Premier Luxury & Institutional Real Estate Marketplace', 'group' => 'general', 'description' => 'Platform tagline'],
-            ['key' => 'contact_email', 'value' => 'support@properties.afriserva.net', 'group' => 'contact', 'description' => 'Support email address'],
+            ['key' => 'contact_email', 'value' => 'support@properties.afriserva.com', 'group' => 'contact', 'description' => 'Support email address'],
             ['key' => 'contact_phone', 'value' => '+234 1 800 2374', 'group' => 'contact', 'description' => 'Primary hotline phone'],
             ['key' => 'office_address', 'value' => 'Level 14, Heritage Towers, Victoria Island, Lagos, Nigeria', 'group' => 'contact', 'description' => 'Corporate office headquarters'],
             ['key' => 'default_currency', 'value' => 'NGN', 'group' => 'localization', 'description' => 'Default system currency ISO'],
@@ -272,7 +272,7 @@ class DatabaseSeeder
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000001',
             'Alexander Wright',
-            'admin@afriserva.net',
+            'admin@afriserva.com',
             '+2348030000001',
             $passwordHash,
             'super_admin',
@@ -283,7 +283,7 @@ class DatabaseSeeder
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000002',
             'Olufunke Adeyemi',
-            'moderator@afriserva.net',
+            'moderator@afriserva.com',
             '+2348030000002',
             $passwordHash,
             'moderator',
@@ -341,7 +341,7 @@ class DatabaseSeeder
         $agent2Id = $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000005',
             'Musa Danjuma',
-            'musa.danjuma@afriserva.net',
+            'musa.danjuma@afriserva.com',
             '+2348094443322',
             $passwordHash,
             'agent',
@@ -394,7 +394,7 @@ class DatabaseSeeder
     private function seedProperties(): void
     {
         $agent1Id = $this->pdo->query("SELECT id FROM users WHERE email = 'chioma@prestigeprime.ng'")->fetchColumn();
-        $agent2Id = $this->pdo->query("SELECT id FROM users WHERE email = 'musa.danjuma@afriserva.net'")->fetchColumn();
+        $agent2Id = $this->pdo->query("SELECT id FROM users WHERE email = 'musa.danjuma@afriserva.com'")->fetchColumn();
         $agencyId = $this->pdo->query("SELECT id FROM agencies WHERE slug = 'prestige-prime-luxury-realty'")->fetchColumn();
 
         $lagosId = $this->pdo->query("SELECT id FROM states WHERE slug = 'lagos'")->fetchColumn();

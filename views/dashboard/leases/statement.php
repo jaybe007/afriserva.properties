@@ -4,7 +4,7 @@
         <div>
             <div style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #0F172A;">AFRISERVA REAL ESTATE</div>
             <div style="font-size: 12px; color: #64748B; margin-top: 4px;">A Division of Cloud Current International Limited • cloudcurrentng.com</div>
-            <div style="font-size: 12px; color: #64748B;">Victoria Island, Lagos, Nigeria • support@afriserva.net • afriserva.net</div>
+            <div style="font-size: 12px; color: #64748B;">Victoria Island, Lagos, Nigeria • support@afriserva.com • afriserva.com</div>
         </div>
         <div style="text-align: right;">
             <div style="font-size: 20px; font-weight: 700; color: #1E3A8A;">STATEMENT OF ACCOUNT</div>
