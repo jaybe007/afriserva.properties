@@ -1,0 +1,22 @@
+{
+    "name": "afriserva/properties",
+    "description": "Enterprise-Grade Real Estate Platform & Property Management Ecosystem",
+    "type": "project",
+    "license": "Proprietary",
+    "require": {
+        "php": ">=8.2.0"
+    },
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "app/Helpers/Formatters.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

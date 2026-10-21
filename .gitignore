@@ -1,0 +1,36 @@
+# Environment and sensitive credentials
+.env
+.env.backup
+.env.local
+.env.*.local
+
+# Composer dependencies and binary
+/vendor/
+composer.phar
+
+# Runtime logs and cache
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/storage/uploads/*
+!/storage/uploads/.gitkeep
+
+# Operating system and editor artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.bak
+*~
+*.log
+
+# Unit and integration test caches
+.phpunit.result.cache
+/coverage/

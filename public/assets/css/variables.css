@@ -1,0 +1,52 @@
+/* Afriserva Properties: Design System Tokens */
+:root {
+    /* Color Palette */
+    --color-primary: #0B192C;
+    --color-primary-light: #1E3E62;
+    --color-primary-dark: #000B1A;
+    
+    --color-accent: #D4AF37;
+    --color-accent-hover: #C59B27;
+    --color-accent-light: #F7F1DF;
+    
+    --color-secondary: #475569;
+    --color-success: #059669;
+    --color-success-bg: #ECFDF5;
+    --color-warning: #D97706;
+    --color-warning-bg: #FFFBEB;
+    --color-danger: #DC2626;
+    --color-danger-bg: #FEF2F2;
+    --color-info: #0284C7;
+    --color-info-bg: #F0F9FF;
+
+    /* Neutrals */
+    --color-bg: #F8FAFC;
+    --color-surface: #FFFFFF;
+    --color-surface-hover: #F1F5F9;
+    --color-border: #E2E8F0;
+    --color-border-dark: #CBD5E1;
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+    --color-text-light: #94A3B8;
+
+    /* Typography */
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    
+    /* Spacing & Radii */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-subtle: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-elevated: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    --shadow-luxury: 0 20px 40px -15px rgba(11, 25, 44, 0.12);
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
