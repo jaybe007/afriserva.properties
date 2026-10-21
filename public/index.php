@@ -6,7 +6,25 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
 // Load Autoloader
-require_once __DIR__ . '/../vendor/autoload.php';
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+} else {
+    // Shared-hosting fallback autoloader (zero composer CLI required)
+    spl_autoload_register(function (string $class): void {
+        $prefix = 'App\\';
+        $baseDir = __DIR__ . '/../app/';
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) !== 0) {
+            return;
+        }
+        $relativeClass = substr($class, $len);
+        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    });
+    require_once __DIR__ . '/../app/Helpers/Formatters.php';
+}
 
 // Simple .env Loader
 $envPath = __DIR__ . '/../.env';
