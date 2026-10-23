@@ -53,6 +53,11 @@
     }
     </script>
 
+    <!-- Google Fonts for Sovereign Luxury Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
     <!-- CSS Design System -->
     <link rel="stylesheet" href="<?= asset('css/variables.css') ?>">
     <link rel="stylesheet" href="<?= asset('css/base.css') ?>">
