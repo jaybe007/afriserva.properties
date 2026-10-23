@@ -265,16 +265,13 @@ class DatabaseSeeder
 
     private function seedUsersAndAgencies(): void
     {
-        // Default password for all seed accounts: Password123!
-        $passwordHash = password_hash('Password123!', PASSWORD_ARGON2ID);
-
         // 1. Super Admin
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000001',
             'Alexander Wright',
-            'admin@afriserva.com',
+            'alexander.wright@afriserva.com',
             '+2348030000001',
-            $passwordHash,
+            password_hash('Afriserva#2026!Xw9$kL7m', PASSWORD_ARGON2ID),
             'super_admin',
             'Executive Director of Technology & Infrastructure at Afriserva Real Estate Group.'
         );
@@ -283,9 +280,9 @@ class DatabaseSeeder
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000002',
             'Olufunke Adeyemi',
-            'moderator@afriserva.com',
+            'olufunke.adeyemi@afriserva.com',
             '+2348030000002',
-            $passwordHash,
+            password_hash('Compliance*2026@P9q#vR4z', PASSWORD_ARGON2ID),
             'moderator',
             'Legal & Property Documentation Verification Specialist.'
         );
@@ -294,9 +291,9 @@ class DatabaseSeeder
         $agencyAdminId = $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000003',
             'Chief Babatunde Balogun',
-            'balogun@prestigeprime.ng',
+            'babatunde.balogun@prestigeprime.ng',
             '+2348021112233',
-            $passwordHash,
+            password_hash('PrestigePrime#99!B7x$mQ2', PASSWORD_ARGON2ID),
             'agency_admin',
             'Managing Partner at Prestige Prime Luxury Realty, specialized in high-net-worth acquisitions across Ikoyi and Banana Island.'
         );
@@ -327,9 +324,9 @@ class DatabaseSeeder
         $agent1Id = $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000004',
             'Chioma Okonkwo',
-            'chioma@prestigeprime.ng',
+            'chioma.okonkwo@prestigeprime.ng',
             '+2348035557788',
-            $passwordHash,
+            password_hash('LuxuryRealty*88@C4w#nK5', PASSWORD_ARGON2ID),
             'agent',
             'Senior Luxury Property Consultant specializing in waterfront mansions, penthouses, and private estates in Banana Island and Eko Atlantic.'
         );
@@ -341,9 +338,9 @@ class DatabaseSeeder
         $agent2Id = $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000005',
             'Musa Danjuma',
-            'musa.danjuma@afriserva.com',
+            'musa.agent@afriserva.com',
             '+2348094443322',
-            $passwordHash,
+            password_hash('AbujaEnclave#77!M3v$jP8', PASSWORD_ARGON2ID),
             'agent',
             'Abuja Diplomatic Zone Real Estate Advisor representing institutional investors, embassies, and private individuals in Maitama and Asokoro.'
         );
@@ -355,9 +352,9 @@ class DatabaseSeeder
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000006',
             'Dr. Emeka Nnamani',
-            'emeka.nnamani@example.com',
+            'dr.emeka.nnamani@afriserva.com',
             '+2348057771122',
-            $passwordHash,
+            password_hash('LekkiPortfolio*55@E2x#bV9', PASSWORD_ARGON2ID),
             'landlord',
             'Private real estate investor with residential portfolio in Lekki Phase 1 and Victoria Island.'
         );
@@ -366,9 +363,9 @@ class DatabaseSeeder
         $this->createUserWithRole(
             'a0000001-0000-0000-0000-000000000007',
             'Zainab Aliyu',
-            'zainab.aliyu@example.com',
+            'zainab.aliyu@afriserva.com',
             '+2348068889900',
-            $passwordHash,
+            password_hash('InvestorClub#33!Z8q$kM4', PASSWORD_ARGON2ID),
             'client',
             'Corporate executive actively acquiring off-plan and luxury residential properties in Lagos and Abuja.'
         );
@@ -393,8 +390,8 @@ class DatabaseSeeder
 
     private function seedProperties(): void
     {
-        $agent1Id = $this->pdo->query("SELECT id FROM users WHERE email = 'chioma@prestigeprime.ng'")->fetchColumn();
-        $agent2Id = $this->pdo->query("SELECT id FROM users WHERE email = 'musa.danjuma@afriserva.com'")->fetchColumn();
+        $agent1Id = $this->pdo->query("SELECT id FROM users WHERE email = 'chioma.okonkwo@prestigeprime.ng'")->fetchColumn();
+        $agent2Id = $this->pdo->query("SELECT id FROM users WHERE email = 'musa.agent@afriserva.com'")->fetchColumn();
         $agencyId = $this->pdo->query("SELECT id FROM agencies WHERE slug = 'prestige-prime-luxury-realty'")->fetchColumn();
 
         $lagosId = $this->pdo->query("SELECT id FROM states WHERE slug = 'lagos'")->fetchColumn();

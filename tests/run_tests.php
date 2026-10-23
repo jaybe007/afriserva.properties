@@ -87,12 +87,12 @@ assertTest("CSRF validation rejects forged/tampered token", !CSRF::validate('for
 
 // 3. User Authentication & RBAC Hierarchy
 echo "\n3. AUTHENTICATION & ROLE-BASED ACCESS CONTROL (RBAC)\n";
-$authSuccess = Auth::attempt('admin@afriserva.com', 'Password123!');
+$authSuccess = Auth::attempt('alexander.wright@afriserva.com', 'Afriserva#2026!Xw9$kL7m');
 assertTest("Super Admin authentication succeeds with valid credentials", $authSuccess);
 assertTest("Super Admin possesses 'super_admin' role clearance", Auth::hasRole('super_admin'));
 assertTest("Super Admin passes superuser bypass for any operational role", Auth::hasRole('moderator'));
 
-$agentAuth = Auth::attempt('chioma@prestigeprime.ng', 'Password123!');
+$agentAuth = Auth::attempt('chioma.okonkwo@prestigeprime.ng', 'LuxuryRealty*88@C4w#nK5');
 assertTest("Licensed Agent authentication succeeds", $agentAuth);
 assertTest("Licensed Agent possesses 'agent' role", Auth::hasRole('agent'));
 assertTest("Licensed Agent is blocked from super_admin clearance", !Auth::hasRole('super_admin'));
@@ -767,7 +767,7 @@ assertTest("Base CSS honors user prefers-reduced-motion OS preferences", str_con
 testHeader("23. SECTION 23: TESTING & QUALITY ASSURANCE (CRITICAL FAILURE SCENARIOS)");
 
 // 1. Invalid Login Attempts & Brute-Force Lockout
-$invalidEmail = "admin@afriserva.com";
+$invalidEmail = "alexander.wright@afriserva.com";
 $invalidPass = "CompletelyWrongPassword_2026!";
 $authResult = \App\Core\Auth::authenticate($invalidEmail, $invalidPass, '127.0.0.1');
 assertTest("Authentication engine rejects incorrect password submission", $authResult['success'] === false && $authResult['user'] === null);

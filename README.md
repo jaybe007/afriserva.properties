@@ -23,19 +23,21 @@ An institutional-grade, multi-tenant real estate marketplace and property asset 
 
 ---
 
-## 2. Default Demo Personas & Credentials
+## 2. Core Personas & System Roles
 
-All demo user accounts are pre-seeded with password: `Password123!`
+The platform enforces strict Role-Based Access Control (RBAC) with cryptographic Argon2id password hashing.
 
-| Role / Persona | Email Address | Access Level & Capabilities |
+| Role / Persona | Username / Email | Access Level & Capabilities |
 | :--- | :--- | :--- |
-| **Super Administrator** | `admin@afriserva.com` | Root system control, listing moderation, user management, global settings |
-| **Compliance Moderator** | `moderator@afriserva.com` | Listing document verification, review queues, legal title auditing |
-| **Elite Agent** | `chioma@prestigeprime.ng` | Luxury portfolio listings, inbound client CRM leads, inspection scheduler |
-| **Abuja Diplomatic Agent**| `musa.danjuma@afriserva.com`| Diplomatic zone estates, viewing appointments, WhatsApp integrations |
-| **Agency Principal** | `balogun@prestigeprime.ng` | Corporate brokerage branding, team members, enterprise subscription |
-| **Private Landlord** | `emeka.nnamani@example.com` | Direct residential listings, rental management |
-| **Client / Investor** | `zainab.aliyu@example.com` | Property discovery, inspection tour bookings, inquiry dispatches |
+| **Super Administrator** | `alexander.wright@afriserva.com` | Root system control, listing moderation, user management, global settings |
+| **Compliance Moderator** | `olufunke.adeyemi@afriserva.com` | Listing document verification, review queues, legal title auditing |
+| **Elite Agent** | `chioma.okonkwo@prestigeprime.ng` | Luxury portfolio listings, inbound client CRM leads, inspection scheduler |
+| **Abuja Diplomatic Agent**| `musa.agent@afriserva.com` | Diplomatic zone estates, viewing appointments, WhatsApp integrations |
+| **Agency Principal** | `babatunde.balogun@prestigeprime.ng` | Corporate brokerage branding, team members, enterprise subscription |
+| **Private Landlord** | `dr.emeka.nnamani@afriserva.com` | Direct residential listings, rental management |
+| **Client / Investor** | `zainab.aliyu@afriserva.com` | Property discovery, inspection tour bookings, inquiry dispatches |
+
+> **Production Security Notice**: All production passwords must meet high-entropy complexity standards (minimum 16 characters with symbols, uppercase, lowercase, and digits). Production password hashes are stored in the database using `PASSWORD_ARGON2ID`. Use `database/010_update_production_credentials.sql` to apply credential updates to your live deployment database.
 
 ---
 

@@ -552,11 +552,12 @@ class DashboardController extends Controller
         // Find or create user
         $existing = \App\Models\User::findByEmail($email);
         if (!$existing) {
+            $tempPassword = bin2hex(random_bytes(6)) . 'A1!';
             $userId = \App\Models\User::create([
                 'full_name' => $fullName,
                 'email' => $email,
                 'phone' => $input['phone'] ?? '',
-                'password' => 'Password123!'
+                'password' => $tempPassword
             ], 'agent');
         } else {
             $userId = (int)$existing['id'];

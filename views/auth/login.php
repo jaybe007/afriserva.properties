@@ -40,26 +40,33 @@
             </button>
         </form>
 
-        <!-- Fast Demo Persona Login -->
+        <?php if (getenv('APP_ENV') === 'development' && getenv('SHOW_DEMO_LOGINS') === 'true'): ?>
+        <!-- Fast Demo Persona Login (Development Only) -->
         <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border);">
             <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); font-weight: 700; margin-bottom: 12px; text-align: center;">
-                ⚡ Fast Demo Persona Login (Password: <code>Password123!</code>)
+                ⚡ Fast Demo Persona Login (Development Only)
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('admin@afriserva.com')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('alexander.wright@afriserva.com')">
                     👑 Super Admin
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('chioma@prestigeprime.ng')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('chioma.okonkwo@prestigeprime.ng')">
                     🏢 Elite Agent
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('balogun@prestigeprime.ng')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('babatunde.balogun@prestigeprime.ng')">
                     🏛 Agency Principal
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('zainab.aliyu@example.com')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('zainab.aliyu@afriserva.com')">
                     👤 Buyer / Client
                 </button>
             </div>
         </div>
+        <script>
+        function setDemo(email) {
+            document.getElementById('login-email').value = email;
+        }
+        </script>
+        <?php endif; ?>
 
         <div style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--color-text-muted);">
             Don't have an account yet? 
@@ -68,9 +75,3 @@
     </div>
 </div>
 
-<script>
-function setDemo(email) {
-    document.getElementById('login-email').value = email;
-    document.getElementById('login-password').value = 'Password123!';
-}
-</script>
