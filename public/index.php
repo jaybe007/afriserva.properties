@@ -120,6 +120,7 @@ $router->post('/forgot-password', [AuthController::class, 'sendResetLink'], [Csr
 $router->get('/reset-password', [AuthController::class, 'resetPasswordForm']);
 $router->post('/reset-password', [AuthController::class, 'resetPassword'], [CsrfMiddleware::class]);
 $router->get('/verify-email', [AuthController::class, 'verifyEmail']);
+$router->post('/dashboard/verify-email-now', [AuthController::class, 'verifyEmailInstant'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->post('/dashboard/verify-phone', [AuthController::class, 'verifyPhone'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->post('/dashboard/request-deletion', [AuthController::class, 'requestAccountDeletion'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->post('/dashboard/sessions/{id}/revoke', [AuthController::class, 'revokeSession'], [CsrfMiddleware::class, AuthMiddleware::class]);

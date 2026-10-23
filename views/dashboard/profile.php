@@ -27,7 +27,10 @@
                         <?php if (!empty($user['email_verified_at'])): ?>
                             <span class="badge badge-verified" style="font-size: 11px;">✓ Email Verified</span>
                         <?php else: ?>
-                            <span class="badge badge-gold" style="font-size: 11px;">Pending Verification</span>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="badge badge-gold" style="font-size: 11px;">Pending Verification</span>
+                                <button type="submit" formaction="<?= url('dashboard/verify-email-now') ?>" formmethod="POST" class="btn btn-sm btn-outline" style="padding: 2px 10px; font-size: 11px; border-color: #f59e0b; color: #b45309; background: #fffbeb;">Verify Now ✉</button>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>

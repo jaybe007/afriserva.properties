@@ -63,11 +63,13 @@
                 <?php foreach ($properties as $prop): ?>
                     <tr>
                         <td style="width: 80px;">
-                            <img src="<?= e($prop['cover_image']) ?>" alt="Property" style="width: 60px; height: 45px; object-fit: cover; border-radius: 4px;">
+                            <img src="<?= e($prop['cover_image']) ?>" alt="Property" style="width: 60px; height: 45px; object-fit: cover; border-radius: 4px;" onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=100';">
                         </td>
                         <td><code><?= e($prop['reference_code']) ?></code></td>
                         <td>
-                            <strong><?= e($prop['title']) ?></strong><br>
+                            <a href="<?= url('properties/' . $prop['slug']) ?>" target="_blank" style="color: inherit; text-decoration: none; font-weight: 700;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                <?= e($prop['title']) ?> ↗
+                            </a><br>
                             <small style="color: var(--color-text-muted);"><?= e($prop['city_name']) ?>, <?= e($prop['state_name']) ?></small>
                         </td>
                         <td><strong><?= format_money($prop['price'], $prop['currency']) ?></strong></td>
@@ -84,6 +86,9 @@
                         <td>👁 <?= $prop['view_count'] ?></td>
                         <td style="text-align: right;">
                             <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                <a href="<?= url('properties/' . $prop['slug']) ?>" target="_blank" class="btn btn-outline btn-sm" style="color: var(--color-gold); border-color: var(--color-gold);" title="View Live on Website">
+                                    🌐 View Live ↗
+                                </a>
                                 <a href="<?= url('dashboard/listings/edit/' . $prop['id']) ?>" class="btn btn-outline btn-sm">
                                     ✏️ Edit
                                 </a>

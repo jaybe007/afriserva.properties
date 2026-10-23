@@ -247,11 +247,26 @@
         </div>
 
         <!-- Add New Image -->
-        <form action="<?= url('dashboard/listings/' . $property['id'] . '/images/store') ?>" method="POST" style="display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; background: #F8FAFC; padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+        <form action="<?= url('dashboard/listings/' . $property['id'] . '/images/store') ?>" method="POST" enctype="multipart/form-data" style="background: #F8FAFC; padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
             <?= csrf_field() ?>
-            <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/photo-..." required>
-            <input type="text" name="caption" class="form-control" placeholder="Caption (e.g. Master Bedroom View)">
-            <button type="submit" class="btn btn-primary btn-sm">➕ Add Photo</button>
+            <strong style="font-size: 14px; display: block; margin-bottom: 12px; color: var(--color-primary);">Upload New Photograph to Gallery</strong>
+            <div style="display: grid; grid-template-columns: 1.5fr 1.5fr 1fr auto; gap: 12px; align-items: end;">
+                <div>
+                    <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--color-text-muted);">Choose File from Device</label>
+                    <input type="file" name="image_file" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" style="background: #fff;">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--color-text-muted);">Or Paste Image URL</label>
+                    <input type="url" name="image_url" class="form-control" placeholder="https://images.unsplash.com/photo-...">
+                </div>
+                <div>
+                    <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px; color: var(--color-text-muted);">Caption</label>
+                    <input type="text" name="caption" class="form-control" placeholder="Master Bedroom View">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary" style="height: 42px; white-space: nowrap;">➕ Add Photo</button>
+                </div>
+            </div>
         </form>
     </div>
 

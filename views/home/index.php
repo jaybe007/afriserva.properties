@@ -198,10 +198,10 @@
         </div>
 
         <div class="property-grid">
-            <?php foreach (array_slice($newlyListed, 0, 3) as $prop): ?>
+            <?php foreach ($newlyListed as $prop): ?>
                 <article class="property-card">
                     <div class="card-media">
-                        <img src="<?= e($prop['cover_image']) ?>" alt="<?= e($prop['title']) ?>" loading="lazy">
+                        <img src="<?= e($prop['cover_image']) ?>" alt="<?= e($prop['title']) ?>" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600';">
                         <div class="card-badges">
                             <span class="badge badge-primary">NEW</span>
                             <span class="badge badge-verified">✓ <?= e($prop['title_document'] ?? 'C of O') ?></span>

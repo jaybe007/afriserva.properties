@@ -237,6 +237,19 @@ class AuthController extends Controller
         $this->redirect($response, url('dashboard/profile'));
     }
 
+    public function verifyEmailInstant(Request $request, Response $response): void
+    {
+        $userId = Auth::id();
+        if (!$userId) {
+            $this->redirect($response, url('login'));
+            return;
+        }
+
+        User::verifyUser($userId);
+        flash('success', 'Your email address has been verified successfully!');
+        $this->redirect($response, url('dashboard/profile'));
+    }
+
     public function revokeSession(Request $request, Response $response, array $params): void
     {
         $sessionId = $params['id'] ?? '';

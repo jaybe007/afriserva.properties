@@ -210,8 +210,17 @@ class DashboardController extends Controller
 
         $propId = (int)Database::lastInsertId();
 
-        // Attach Image (cover URL or uploaded file)
-        $imageUrl = trim($input['image_url'] ?? '');
+        // Attach Primary Cover Image (uploaded file or URL)
+        $imageUrl = '';
+        if (!empty($_FILES['cover_image_file']['tmp_name'])) {
+            $uploaded = \App\Helpers\UploadHelper::uploadImage($_FILES['cover_image_file']);
+            if ($uploaded) {
+                $imageUrl = $uploaded;
+            }
+        }
+        if (empty($imageUrl)) {
+            $imageUrl = trim($input['image_url'] ?? '');
+        }
         if (empty($imageUrl)) {
             $imageUrl = 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80';
         }
@@ -220,6 +229,19 @@ class DashboardController extends Controller
              VALUES (?, ?, ?, ?, 1, 1)",
             [$propId, $imageUrl, $imageUrl, trim($input['title'])]
         );
+
+        // Attach Additional Gallery Images (if uploaded)
+        if (!empty($_FILES['gallery_images']['name']) && is_array($_FILES['gallery_images']['name'])) {
+            $galleryUrls = \App\Helpers\UploadHelper::uploadMultipleImages($_FILES['gallery_images']);
+            $order = 2;
+            foreach ($galleryUrls as $gUrl) {
+                Database::execute(
+                    "INSERT INTO property_images (property_id, image_url, thumbnail_url, caption, is_cover, display_order)
+                     VALUES (?, ?, ?, ?, 0, ?)",
+                    [$propId, $gUrl, $gUrl, trim($input['title']), $order++]
+                );
+            }
+        }
 
         // Attach Amenities
         if (!empty($input['amenities']) && is_array($input['amenities'])) {
@@ -338,7 +360,16 @@ class DashboardController extends Controller
             return;
         }
 
-        $imageUrl = trim($request->input('image_url', ''));
+        $imageUrl = '';
+        if (!empty($_FILES['image_file']['tmp_name'])) {
+            $uploaded = \App\Helpers\UploadHelper::uploadImage($_FILES['image_file']);
+            if ($uploaded) {
+                $imageUrl = $uploaded;
+            }
+        }
+        if (empty($imageUrl)) {
+            $imageUrl = trim($request->input('image_url', ''));
+        }
         $caption = trim($request->input('caption', ''));
 
         if (!empty($imageUrl)) {
@@ -349,6 +380,8 @@ class DashboardController extends Controller
             );
             \App\Helpers\AuditLogger::log('property_image_added', 'property', $id, null, ['image_url' => $imageUrl]);
             flash('success', 'Photograph added to property gallery.');
+        } else {
+            flash('warning', 'Please provide an image file or a valid photo URL.');
         }
 
         $this->redirect($response, url('dashboard/listings/edit/' . $id));

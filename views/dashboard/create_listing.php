@@ -17,7 +17,7 @@
         </div>
     <?php endif; ?>
 
-    <form action="<?= url('dashboard/listings/store') ?>" method="POST" style="background: #FFFFFF; border-radius: var(--radius-xl); border: 1px solid var(--color-border); padding: 40px; box-shadow: var(--shadow-subtle);">
+    <form action="<?= url('dashboard/listings/store') ?>" method="POST" enctype="multipart/form-data" style="background: #FFFFFF; border-radius: var(--radius-xl); border: 1px solid var(--color-border); padding: 40px; box-shadow: var(--shadow-subtle);">
         <?= csrf_field() ?>
 
         <!-- 1. Basic Information -->
@@ -198,14 +198,42 @@
             <?php endforeach; ?>
         </div>
 
-        <!-- 7. Media Cover Image -->
+        <!-- 6. High-Definition Photography & File Upload -->
         <h3 style="font-size: 18px; margin: 32px 0 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
-            6. High-Definition Photography
+            6. High-Definition Photography & Picture Uploads
         </h3>
-        <div class="form-group">
-            <label class="form-label">Primary Cover Image URL</label>
+
+        <!-- Primary Cover Photo Upload -->
+        <div class="form-group" style="background: #F8FAFC; border: 2px dashed #CBD5E1; border-radius: var(--radius-lg); padding: 24px; text-align: center; margin-bottom: 24px;">
+            <label style="display: block; font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--color-primary); cursor: pointer;" for="cover_image_file">
+                📸 Select Primary Cover Photo *
+            </label>
+            <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 14px;">
+                Upload the main hero photograph displayed on the homepage and search listings (JPG, PNG, WebP up to 12MB).
+            </p>
+            <input type="file" name="cover_image_file" id="cover_image_file" accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" style="max-width: 400px; margin: 0 auto 12px; background: #fff;" onchange="previewCoverImage(this)">
+            <div id="cover_preview_container" style="display: none; margin-top: 14px;">
+                <span style="font-size: 12px; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 6px;">Selected Cover Preview:</span>
+                <img id="cover_preview_img" src="" alt="Cover Preview" style="max-height: 200px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover;">
+            </div>
+        </div>
+
+        <!-- Additional Gallery Photos Upload -->
+        <div class="form-group" style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px;">
+            <label style="display: block; font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--color-primary);" for="gallery_images">
+                🖼️ Additional Gallery Photos (Select Multiple)
+            </label>
+            <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 12px;">
+                Upload interior rooms, kitchen, master bedroom, compound, or floor plan images.
+            </p>
+            <input type="file" name="gallery_images[]" id="gallery_images" multiple accept="image/jpeg,image/png,image/webp,image/gif" class="form-control" style="background: #fff;" onchange="previewGalleryImages(this)">
+            <div id="gallery_preview_container" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px;"></div>
+        </div>
+
+        <!-- Web URL Alternative -->
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label" style="font-size: 13px; color: var(--color-text-muted);">Or alternatively provide an Image URL (Optional fallback)</label>
             <input type="url" name="image_url" class="form-control" value="<?= e($input['image_url'] ?? '') ?>" placeholder="https://images.unsplash.com/photo-...">
-            <small style="color: var(--color-text-muted);">Provide a high-resolution image URL (or leave blank to use high-quality default architecture photography).</small>
         </div>
 
         <button type="submit" class="btn btn-accent btn-lg" style="width: 100%; margin-top: 16px;">
@@ -213,3 +241,41 @@
         </button>
     </form>
 </div>
+
+<script>
+function previewCoverImage(input) {
+    const container = document.getElementById('cover_preview_container');
+    const img = document.getElementById('cover_preview_img');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            container.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        container.style.display = 'none';
+    }
+}
+
+function previewGalleryImages(input) {
+    const container = document.getElementById('gallery_preview_container');
+    container.innerHTML = '';
+    if (input.files) {
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const thumb = document.createElement('img');
+                thumb.src = e.target.result;
+                thumb.style.width = '80px';
+                thumb.style.height = '60px';
+                thumb.style.objectFit = 'cover';
+                thumb.style.borderRadius = '6px';
+                thumb.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
+                container.appendChild(thumb);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+}
+</script>

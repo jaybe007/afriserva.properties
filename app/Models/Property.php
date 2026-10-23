@@ -291,6 +291,7 @@ class Property
     private static function determineOrderBy(string $sort): string
     {
         return match ($sort) {
+            'newest' => 'p.created_at DESC',
             'price_asc' => 'p.price ASC',
             'price_desc' => 'p.price DESC',
             'views' => 'p.view_count DESC',

@@ -35,9 +35,9 @@ class User
 
         $sql = "INSERT INTO users (
             uuid, full_name, email, phone, password_hash, status, 
-            email_verification_token, terms_accepted_at, privacy_accepted_at, 
+            email_verification_token, email_verified_at, terms_accepted_at, privacy_accepted_at, 
             consent_ip_address, created_at
-        ) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW(), NOW(), ?, NOW())";
+        ) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW(), NOW(), NOW(), ?, NOW())";
 
         Database::execute($sql, [
             $uuid,
@@ -124,6 +124,16 @@ class User
         );
 
         \App\Helpers\AuditLogger::log('email_verified', 'user', (int)$user['id']);
+        return true;
+    }
+
+    public static function verifyUser(int $userId): bool
+    {
+        Database::execute(
+            "UPDATE users SET email_verified_at = NOW(), email_verification_token = NULL WHERE id = ?",
+            [$userId]
+        );
+        \App\Helpers\AuditLogger::log('email_verified', 'user', $userId);
         return true;
     }
 
