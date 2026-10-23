@@ -134,11 +134,17 @@
 
     <!-- Gallery Grid -->
     <div class="gallery-grid">
-        <?php foreach ($property['images'] as $idx => $img): ?>
-            <div class="gallery-item <?= $idx === 0 ? 'gallery-item-main' : '' ?>">
-                <img src="<?= e($img['image_url']) ?>" alt="<?= e($property['title']) ?>" loading="lazy">
+        <?php if (!empty($property['images'])): ?>
+            <?php foreach ($property['images'] as $idx => $img): ?>
+                <div class="gallery-item <?= $idx === 0 ? 'gallery-item-main' : '' ?>">
+                    <img src="<?= e($img['image_url']) ?>" alt="<?= e($property['title']) ?>" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200';">
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="gallery-item gallery-item-main">
+                <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200" alt="<?= e($property['title']) ?>" loading="lazy">
             </div>
-        <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
     <!-- Main Content & Contact Sidebar -->

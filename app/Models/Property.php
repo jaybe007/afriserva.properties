@@ -27,12 +27,12 @@ class Property
                        ag.name AS agency_name,
                        (SELECT image_url FROM property_images pi WHERE pi.property_id = p.id ORDER BY pi.is_cover DESC, pi.display_order ASC LIMIT 1) AS cover_image
                 FROM properties p
-                JOIN property_categories c ON c.id = p.category_id
-                JOIN property_types pt ON pt.id = p.property_type_id
-                JOIN states s ON s.id = p.state_id
-                JOIN cities ci ON ci.id = p.city_id
+                LEFT JOIN property_categories c ON c.id = p.category_id
+                LEFT JOIN property_types pt ON pt.id = p.property_type_id
+                LEFT JOIN states s ON s.id = p.state_id
+                LEFT JOIN cities ci ON ci.id = p.city_id
                 LEFT JOIN neighbourhoods n ON n.id = p.neighbourhood_id
-                JOIN users u ON u.id = p.user_id
+                LEFT JOIN users u ON u.id = p.user_id
                 LEFT JOIN agencies ag ON ag.id = p.agency_id
                 WHERE {$whereClause}
                 ORDER BY {$orderBy}
@@ -51,11 +51,12 @@ class Property
         $whereClause = implode(" AND ", $where);
 
         $sql = "SELECT COUNT(*) FROM properties p
-                JOIN property_categories c ON c.id = p.category_id
-                JOIN property_types pt ON pt.id = p.property_type_id
-                JOIN states s ON s.id = p.state_id
-                JOIN cities ci ON ci.id = p.city_id
+                LEFT JOIN property_categories c ON c.id = p.category_id
+                LEFT JOIN property_types pt ON pt.id = p.property_type_id
+                LEFT JOIN states s ON s.id = p.state_id
+                LEFT JOIN cities ci ON ci.id = p.city_id
                 LEFT JOIN neighbourhoods n ON n.id = p.neighbourhood_id
+                LEFT JOIN users u ON u.id = p.user_id
                 WHERE {$whereClause}";
 
         return (int)Database::fetchColumn($sql, $params);
@@ -73,12 +74,12 @@ class Property
                        ag.name AS agency_name, ag.phone AS agency_phone, ag.email AS agency_email, ag.logo_url AS agency_logo,
                        ap.whatsapp_number, ap.rating AS agent_rating, ap.total_reviews AS agent_reviews, ap.license_no AS agent_license
                 FROM properties p
-                JOIN property_categories c ON c.id = p.category_id
-                JOIN property_types pt ON pt.id = p.property_type_id
-                JOIN states s ON s.id = p.state_id
-                JOIN cities ci ON ci.id = p.city_id
+                LEFT JOIN property_categories c ON c.id = p.category_id
+                LEFT JOIN property_types pt ON pt.id = p.property_type_id
+                LEFT JOIN states s ON s.id = p.state_id
+                LEFT JOIN cities ci ON ci.id = p.city_id
                 LEFT JOIN neighbourhoods n ON n.id = p.neighbourhood_id
-                JOIN users u ON u.id = p.user_id
+                LEFT JOIN users u ON u.id = p.user_id
                 LEFT JOIN agencies ag ON ag.id = p.agency_id
                 LEFT JOIN agent_profiles ap ON ap.user_id = u.id
                 WHERE p.slug = ? AND p.deleted_at IS NULL
