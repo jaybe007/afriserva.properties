@@ -202,6 +202,7 @@ $router->post('/admin/verifications/{id}/review', [AdminController::class, 'revi
 $router->post('/admin/verifications/{id}/assign', [AdminController::class, 'assignReviewer'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->get('/admin/listings', [AdminController::class, 'listings'], [RoleMiddleware::class]);
 $router->post('/admin/listings/{id}/status', [AdminController::class, 'updateListingStatus'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->post('/admin/listings/{id}/delete', [AdminController::class, 'deleteListing'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->get('/admin/categories', [AdminController::class, 'categories'], [RoleMiddleware::class]);
 $router->post('/admin/categories/store', [AdminController::class, 'storeCategory'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->post('/admin/amenities/store', [AdminController::class, 'storeAmenity'], [CsrfMiddleware::class, RoleMiddleware::class]);
@@ -209,6 +210,8 @@ $router->get('/admin/coupons', [AdminController::class, 'coupons'], [RoleMiddlew
 $router->post('/admin/coupons/store', [AdminController::class, 'storeCoupon'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->get('/admin/users', [AdminController::class, 'users'], [RoleMiddleware::class]);
 $router->post('/admin/users/{id}/toggle', [AdminController::class, 'toggleUserStatus'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->post('/admin/users/{id}/role', [AdminController::class, 'updateUserRole'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->post('/admin/users/{id}/reset-password', [AdminController::class, 'resetUserPassword'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->get('/admin/deletion-requests', [AdminController::class, 'deletionRequests'], [RoleMiddleware::class]);
 $router->post('/admin/deletion-requests/{id}/process', [AdminController::class, 'processDeletionRequest'], [CsrfMiddleware::class, RoleMiddleware::class]);
 $router->get('/admin/locations', [AdminController::class, 'locations'], [RoleMiddleware::class]);

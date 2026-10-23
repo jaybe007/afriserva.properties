@@ -49,13 +49,26 @@ class DashboardController extends Controller
                 'subscription' => $subscription
             ], 'layouts/dashboard');
         } else {
-            // Client/Buyer Portal
+            // Client/Buyer & Tenant Portal
             $appointments = ViewingAppointment::getByUser($userId);
+            $savedCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM saved_properties WHERE user_id = ?", [$userId]);
+            $leases = \App\Models\Lease::getForTenant($userId);
+            $applications = \App\Models\RentalApplication::getForApplicant($userId);
+            $maintenanceRequests = \App\Models\MaintenanceRequest::getForTenant($userId);
+            $enquiriesCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM enquiries WHERE user_id = ? OR email = ?", [$userId, $user['email'] ?? '']);
+
+            $isTenant = Auth::hasRole('tenant');
             $html = $this->render('dashboard/client', [
-                'title' => 'My Client Portal | Afriserva Real Estate',
+                'title' => ($isTenant ? 'Tenant Living Portal' : 'Property Buyer & Investor Portal') . ' | Afriserva Real Estate',
                 'user' => $user,
                 'isProfessional' => false,
-                'appointments' => $appointments
+                'isTenant' => $isTenant,
+                'appointments' => $appointments,
+                'savedCount' => $savedCount,
+                'leases' => $leases,
+                'applications' => $applications,
+                'maintenanceRequests' => $maintenanceRequests,
+                'enquiriesCount' => $enquiriesCount
             ], 'layouts/dashboard');
         }
 
@@ -77,6 +90,12 @@ class DashboardController extends Controller
 
     public function createListingForm(Request $request, Response $response): void
     {
+        if (!Auth::hasRole(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin'])) {
+            flash('warning', 'Listing creation requires a verified Seller, Landlord, Agent, Developer, or Property Manager account.');
+            $this->redirect($response, url('dashboard'));
+            return;
+        }
+
         $states = Location::getStates();
         $categories = Database::query("SELECT * FROM property_categories ORDER BY display_order ASC");
         $propertyTypes = Database::query("SELECT * FROM property_types ORDER BY name ASC");
@@ -502,6 +521,12 @@ class DashboardController extends Controller
 
     public function team(Request $request, Response $response): void
     {
+        if (!Auth::hasRole(['agency_admin', 'super_admin'])) {
+            flash('warning', 'Agency team management is restricted to corporate broker firms.');
+            $this->redirect($response, url('dashboard'));
+            return;
+        }
+
         $userId = Auth::id();
 
         // Find agency associated with current user

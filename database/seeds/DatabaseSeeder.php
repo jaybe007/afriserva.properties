@@ -38,7 +38,11 @@ class DatabaseSeeder
             ['name' => 'agent', 'label' => 'Licensed Real Estate Agent', 'description' => 'Lists properties, receives leads and schedules viewings'],
             ['name' => 'developer', 'label' => 'Property Developer', 'description' => 'Develops and showcases off-plan estates and phases'],
             ['name' => 'landlord', 'label' => 'Property Owner / Landlord', 'description' => 'Direct owner listing properties and managing leases'],
-            ['name' => 'client', 'label' => 'Buyer / Tenant / Investor', 'description' => 'Searches, saves favorites, books tours and sends enquiries']
+            ['name' => 'client', 'label' => 'Property Buyer / Investor', 'description' => 'Searches, saves favorites, books tours and sends enquiries'],
+            ['name' => 'tenant', 'label' => 'Tenant', 'description' => 'Leases residential or commercial properties and submits maintenance requests'],
+            ['name' => 'seller', 'label' => 'Property Seller', 'description' => 'Direct owner listing properties and land plots for outright sale'],
+            ['name' => 'property_manager', 'label' => 'Property Manager', 'description' => 'Oversees facility management, rent collection and tenancy operations'],
+            ['name' => 'support', 'label' => 'Customer Support', 'description' => 'Handles buyer/tenant enquiries, reviews disputes and assists users']
         ];
 
         $stmt = $this->pdo->prepare("INSERT IGNORE INTO roles (name, label, description) VALUES (?, ?, ?)");

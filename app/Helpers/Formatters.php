@@ -151,16 +151,28 @@ if (!function_exists('is_logged_in')) {
 if (!function_exists('has_role')) {
     function has_role(string|array $roles): bool
     {
-        $user = auth_user();
-        if (!$user) return false;
-        $userRoles = $user['roles'] ?? [];
-        if (is_string($roles)) {
-            return in_array($roles, $userRoles, true);
-        }
-        foreach ($roles as $r) {
-            if (in_array($r, $userRoles, true)) return true;
-        }
-        return false;
+        return Auth::hasRole($roles);
+    }
+}
+
+if (!function_exists('format_role_label')) {
+    function format_role_label(?string $role): string
+    {
+        $map = [
+            'client' => 'Property Buyer',
+            'tenant' => 'Tenant',
+            'landlord' => 'Landlord',
+            'seller' => 'Property Seller',
+            'agent' => 'Individual Agent',
+            'agency_admin' => 'Real Estate Agency',
+            'developer' => 'Property Developer',
+            'property_manager' => 'Property Manager',
+            'super_admin' => 'Super Administrator',
+            'moderator' => 'Compliance Moderator',
+            'finance_admin' => 'Finance Administrator',
+            'support' => 'Support Specialist',
+        ];
+        return $map[$role ?? ''] ?? ucwords(str_replace('_', ' ', $role ?? 'Member'));
     }
 }
 

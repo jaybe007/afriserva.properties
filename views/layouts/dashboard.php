@@ -49,7 +49,7 @@
                 </a>
             </li>
 
-            <?php if (has_role(['agent', 'agency_admin', 'landlord', 'developer', 'super_admin'])): ?>
+            <?php if (has_role(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin'])): ?>
                 <li class="sidebar-item">
                     <a href="<?= url('dashboard/listings') ?>" class="sidebar-link">
                         <span>🏢</span> My Listings
@@ -70,21 +70,30 @@
                         <span>📅</span> Inspection Tours
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a href="<?= url('dashboard/rental-applications') ?>" class="sidebar-link">
-                        <span>📑</span> Rental Applications
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="<?= url('dashboard/leases') ?>" class="sidebar-link">
-                        <span>📜</span> Tenancy & Leases
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="<?= url('dashboard/maintenance') ?>" class="sidebar-link">
-                        <span>🔧</span> Maintenance Hub
-                    </a>
-                </li>
+                <?php if (has_role(['agency_admin', 'super_admin'])): ?>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/team') ?>" class="sidebar-link">
+                            <span>👥</span> Agency Team
+                        </a>
+                    </li>
+                <?php endif; ?>
+                <?php if (has_role(['landlord', 'property_manager', 'developer', 'agent', 'agency_admin', 'super_admin'])): ?>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/rental-applications') ?>" class="sidebar-link">
+                            <span>📑</span> Rental Applications
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/leases') ?>" class="sidebar-link">
+                            <span>📜</span> Tenancy & Leases
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/maintenance') ?>" class="sidebar-link">
+                            <span>🔧</span> Maintenance Hub
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <li class="sidebar-item">
                     <a href="<?= url('dashboard/invoices') ?>" class="sidebar-link">
                         <span>💳</span> Invoices & Billing
@@ -97,20 +106,43 @@
                 </li>
             <?php else: ?>
                 <li class="sidebar-item">
-                    <a href="<?= url('dashboard/rental-applications') ?>" class="sidebar-link">
-                        <span>📑</span> My Tenancy Apps
+                    <a href="<?= url('dashboard/viewings') ?>" class="sidebar-link">
+                        <span>📅</span> My Inspection Tours
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a href="<?= url('dashboard/leases') ?>" class="sidebar-link">
-                        <span>📜</span> My Leases
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="<?= url('dashboard/maintenance') ?>" class="sidebar-link">
-                        <span>🔧</span> Maintenance Requests
-                    </a>
-                </li>
+                <?php if (has_role('tenant')): ?>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/leases') ?>" class="sidebar-link">
+                            <span>📜</span> My Active Leases
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/rental-applications') ?>" class="sidebar-link">
+                            <span>📑</span> My Tenancy Apps
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/maintenance') ?>" class="sidebar-link">
+                            <span>🔧</span> Maintenance Requests
+                        </a>
+                    </li>
+                <?php else: ?>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/rental-applications') ?>" class="sidebar-link">
+                            <span>📑</span> My Tenancy Apps
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/leases') ?>" class="sidebar-link">
+                            <span>📜</span> My Leases
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="<?= url('dashboard/maintenance') ?>" class="sidebar-link">
+                            <span>🔧</span> Maintenance Requests
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <li class="sidebar-item">
                     <a href="<?= url('properties') ?>" class="sidebar-link">
                         <span>🔍</span> Browse Listings
@@ -142,8 +174,8 @@
             <div style="font-size: 13px; color: #FFFFFF; font-weight: 600; margin-bottom: 4px;">
                 <?= e(auth_user()['full_name'] ?? 'User') ?>
             </div>
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--color-accent); margin-bottom: 16px;">
-                <?= e(auth_user()['roles'][0] ?? 'Client') ?>
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--color-accent); margin-bottom: 16px; letter-spacing: 0.5px;">
+                <?= e(format_role_label(auth_user()['roles'][0] ?? 'client')) ?>
             </div>
             <a href="<?= url('logout') ?>" class="btn btn-outline btn-sm" style="width: 100%; border-color: rgba(255, 255, 255, 0.2); color: #FFF;">
                 Sign Out

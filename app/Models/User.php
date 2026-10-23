@@ -52,13 +52,40 @@ class User
         $userId = (int)Database::lastInsertId();
         self::assignRole($userId, $role);
 
-        // If registered as an agent, create agent profile stub
+        // If registered as an agent or agency admin, create agent profile stub
         if (in_array($role, ['agent', 'agency_admin'], true)) {
             Database::execute(
                 "INSERT IGNORE INTO agent_profiles (user_id, license_no, experience_years, rating, total_reviews)
                  VALUES (?, ?, ?, 5.0, 0)",
                 [$userId, 'PENDING-LIC-' . $userId, 1]
             );
+        }
+
+        // If registered as real estate agency admin, initialize agency firm and principal record
+        if ($role === 'agency_admin') {
+            try {
+                $slug = 'agency-' . substr(bin2hex(random_bytes(4)), 0, 8);
+                Database::execute(
+                    "INSERT INTO agencies (name, slug, email, phone, address, city, state, is_verified, created_at) 
+                     VALUES (?, ?, ?, ?, 'Headquarters Office', 'Lagos', 'Lagos', 1, NOW())",
+                    [
+                        trim($data['full_name']) . ' Realty Firm',
+                        $slug,
+                        trim(strtolower($data['email'])),
+                        trim($data['phone'] ?? '+2348000000000')
+                    ]
+                );
+                $newAgencyId = (int)Database::lastInsertId();
+                Database::execute(
+                    "INSERT INTO agency_members (agency_id, user_id, role_in_agency, status, created_at) 
+                     VALUES (?, ?, 'principal', 'active', NOW())",
+                    [$newAgencyId, $userId]
+                );
+                Database::execute(
+                    "UPDATE agent_profiles SET agency_id = ? WHERE user_id = ?",
+                    [$newAgencyId, $userId]
+                );
+            } catch (\Exception $e) {}
         }
 
         \App\Helpers\AuditLogger::log('user_registered', 'user', $userId, null, [

@@ -20,7 +20,12 @@ class AdminController extends Controller
             'pending_reviews' => (int)Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE status = 'pending_review' OR verification_status IN ('submitted', 'under_review')"),
             'total_enquiries' => (int)Database::fetchColumn("SELECT COUNT(*) FROM enquiries"),
             'active_subscriptions' => (int)Database::fetchColumn("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'"),
-            'total_agencies' => (int)Database::fetchColumn("SELECT COUNT(*) FROM agencies")
+            'total_agencies' => (int)Database::fetchColumn("SELECT COUNT(*) FROM agencies"),
+            'total_revenue' => (float)Database::fetchColumn("SELECT COALESCE(SUM(amount), 0) FROM payments WHERE status = 'successful'"),
+            'pending_refunds' => (int)Database::fetchColumn("SELECT COUNT(*) FROM refund_requests WHERE status = 'pending'"),
+            'pending_deletions' => (int)Database::fetchColumn("SELECT COUNT(*) FROM account_deletion_requests WHERE status = 'pending'"),
+            'unresolved_reports' => (int)Database::fetchColumn("SELECT COUNT(*) FROM listing_reports WHERE status = 'pending'"),
+            'recent_failed_logins' => (int)Database::fetchColumn("SELECT COUNT(*) FROM login_attempts WHERE attempted_at >= (NOW() - INTERVAL 24 HOUR)")
         ];
 
         $pendingListings = Database::query(
@@ -135,6 +140,32 @@ class AdminController extends Controller
 
     public function listings(Request $request, Response $response): void
     {
+        $q = trim($request->input('q', ''));
+        $statusFilter = trim($request->input('status', ''));
+        $verifFilter = trim($request->input('verification', ''));
+
+        $where = ["p.deleted_at IS NULL"];
+        $params = [];
+
+        if (!empty($q)) {
+            $where[] = "(p.title LIKE ? OR p.reference_code LIKE ? OR u.full_name LIKE ?)";
+            $params[] = "%$q%";
+            $params[] = "%$q%";
+            $params[] = "%$q%";
+        }
+
+        if (!empty($statusFilter)) {
+            $where[] = "p.status = ?";
+            $params[] = $statusFilter;
+        }
+
+        if (!empty($verifFilter)) {
+            $where[] = "p.verification_status = ?";
+            $params[] = $verifFilter;
+        }
+
+        $whereSql = implode(" AND ", $where);
+
         $properties = Database::query(
             "SELECT p.*, u.full_name AS agent_name, s.name AS state_name, ci.name AS city_name,
                     (SELECT image_url FROM property_images pi WHERE pi.property_id = p.id ORDER BY is_cover DESC LIMIT 1) AS cover_image
@@ -142,13 +173,27 @@ class AdminController extends Controller
              JOIN users u ON u.id = p.user_id
              JOIN states s ON s.id = p.state_id
              JOIN cities ci ON ci.id = p.city_id
-             WHERE p.deleted_at IS NULL
-             ORDER BY p.created_at DESC"
+             WHERE {$whereSql}
+             ORDER BY p.created_at DESC",
+            $params
         );
+
+        $counts = [
+            'total' => (int)Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE deleted_at IS NULL"),
+            'pending' => (int)Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE status = 'pending_review' AND deleted_at IS NULL"),
+            'published' => (int)Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE status = 'published' AND deleted_at IS NULL"),
+            'rejected' => (int)Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE status = 'rejected' AND deleted_at IS NULL"),
+        ];
 
         $html = $this->render('admin/listings', [
             'title' => 'Property Listing Moderation & Verification | Afriserva Real Estate',
-            'properties' => $properties
+            'properties' => $properties,
+            'counts' => $counts,
+            'filters' => [
+                'q' => $q,
+                'status' => $statusFilter,
+                'verification' => $verifFilter
+            ]
         ], 'layouts/admin');
 
         $response->html($html);
@@ -173,6 +218,17 @@ class AdminController extends Controller
             flash('success', "Featured status updated for property #{$id}.");
         }
 
+        $this->redirect($response, url('admin/listings'));
+    }
+
+    public function deleteListing(Request $request, Response $response, array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0) {
+            Database::execute("UPDATE properties SET deleted_at = NOW(), status = 'archived' WHERE id = ?", [$id]);
+            \App\Helpers\AuditLogger::log('property_deleted_admin', 'property', $id);
+            flash('info', "Property #{$id} has been removed from marketplace inventory.");
+        }
         $this->redirect($response, url('admin/listings'));
     }
 
@@ -331,17 +387,63 @@ class AdminController extends Controller
 
     public function users(Request $request, Response $response): void
     {
+        $q = trim($request->input('q', ''));
+        $roleFilter = trim($request->input('role', ''));
+        $statusFilter = trim($request->input('status', ''));
+
+        $where = ["1=1"];
+        $params = [];
+
+        if (!empty($q)) {
+            $where[] = "(u.full_name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)";
+            $params[] = "%$q%";
+            $params[] = "%$q%";
+            $params[] = "%$q%";
+        }
+
+        if (!empty($roleFilter)) {
+            $where[] = "EXISTS (SELECT 1 FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE ur.user_id = u.id AND r.name = ?)";
+            $params[] = $roleFilter;
+        }
+
+        if (!empty($statusFilter)) {
+            $where[] = "u.status = ?";
+            $params[] = $statusFilter;
+        }
+
+        $whereSql = implode(" AND ", $where);
+
         $users = Database::query(
             "SELECT u.*, 
                     (SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = u.id LIMIT 1) AS role_name,
+                    (SELECT r.label FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = u.id LIMIT 1) AS role_label,
                     (SELECT COUNT(*) FROM properties p WHERE p.user_id = u.id AND p.deleted_at IS NULL) AS total_listings
              FROM users u
-             ORDER BY u.created_at DESC"
+             WHERE {$whereSql}
+             ORDER BY u.created_at DESC",
+            $params
         );
+
+        $roles = Database::query("SELECT id, name, label FROM roles ORDER BY label ASC");
+
+        $counts = [
+            'total' => (int)Database::fetchColumn("SELECT COUNT(*) FROM users"),
+            'active' => (int)Database::fetchColumn("SELECT COUNT(*) FROM users WHERE status = 'active'"),
+            'suspended' => (int)Database::fetchColumn("SELECT COUNT(*) FROM users WHERE status = 'suspended'"),
+            'agents' => (int)Database::fetchColumn("SELECT COUNT(*) FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE r.name = 'agent'"),
+            'landlords' => (int)Database::fetchColumn("SELECT COUNT(*) FROM user_roles ur JOIN roles r ON r.id = ur.role_id WHERE r.name = 'landlord'")
+        ];
 
         $html = $this->render('admin/users', [
             'title' => 'User Management & Clearance | Afriserva Real Estate',
-            'users' => $users
+            'users' => $users,
+            'roles' => $roles,
+            'counts' => $counts,
+            'filters' => [
+                'q' => $q,
+                'role' => $roleFilter,
+                'status' => $statusFilter
+            ]
         ], 'layouts/admin');
 
         $response->html($html);
@@ -350,6 +452,14 @@ class AdminController extends Controller
     public function toggleUserStatus(Request $request, Response $response, array $params): void
     {
         $id = (int)($params['id'] ?? 0);
+
+        // Security check: Prevent super admin from accidentally suspending own account
+        if ($id === (int)Auth::id()) {
+            flash('danger', 'Security Protection: You cannot suspend your own active administrator account.');
+            $this->redirect($response, url('admin/users'));
+            return;
+        }
+
         $user = Database::fetch("SELECT status FROM users WHERE id = ?", [$id]);
         if ($user) {
             $newStatus = ($user['status'] === 'active') ? 'suspended' : 'active';
@@ -357,6 +467,67 @@ class AdminController extends Controller
             \App\Helpers\AuditLogger::log('user_status_toggle', 'user', $id, ['status' => $user['status']], ['status' => $newStatus]);
             flash('info', "User #{$id} status changed to {$newStatus}.");
         }
+        $this->redirect($response, url('admin/users'));
+    }
+
+    public function updateUserRole(Request $request, Response $response, array $params): void
+    {
+        $userId = (int)($params['id'] ?? 0);
+        $roleName = trim($request->input('role_name', ''));
+
+        if ($userId <= 0 || empty($roleName)) {
+            flash('danger', 'Invalid user or role selection.');
+            $this->redirect($response, url('admin/users'));
+            return;
+        }
+
+        $role = Database::fetch("SELECT id, name, label FROM roles WHERE name = ?", [$roleName]);
+        if (!$role) {
+            flash('danger', "Role '{$roleName}' does not exist.");
+            $this->redirect($response, url('admin/users'));
+            return;
+        }
+
+        $prevRole = Database::fetchColumn(
+            "SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = ? LIMIT 1",
+            [$userId]
+        );
+
+        Database::execute("DELETE FROM user_roles WHERE user_id = ?", [$userId]);
+        Database::execute("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", [$userId, $role['id']]);
+
+        \App\Helpers\AuditLogger::log('user_role_updated', 'user', $userId, ['role' => $prevRole], ['role' => $roleName]);
+        flash('success', "Role for User #{$userId} updated to " . strtoupper($role['label']) . ".");
+        $this->redirect($response, url('admin/users'));
+    }
+
+    public function resetUserPassword(Request $request, Response $response, array $params): void
+    {
+        $userId = (int)($params['id'] ?? 0);
+        $customPass = trim($request->input('new_password', ''));
+
+        if ($userId <= 0) {
+            flash('danger', 'Invalid user account.');
+            $this->redirect($response, url('admin/users'));
+            return;
+        }
+
+        if (empty($customPass)) {
+            $generatedPassword = 'Pass#' . bin2hex(random_bytes(4)) . '!2026';
+        } else {
+            if (strlen($customPass) < 8) {
+                flash('danger', 'Password must be at least 8 characters long.');
+                $this->redirect($response, url('admin/users'));
+                return;
+            }
+            $generatedPassword = $customPass;
+        }
+
+        $hash = password_hash($generatedPassword, PASSWORD_ARGON2ID);
+        Database::execute("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [$hash, $userId]);
+        \App\Helpers\AuditLogger::log('user_password_admin_reset', 'user', $userId);
+
+        flash('success', "Password for User #{$userId} reset successfully! Temporary Password: <strong>{$generatedPassword}</strong> (Please share securely with the user).");
         $this->redirect($response, url('admin/users'));
     }
 

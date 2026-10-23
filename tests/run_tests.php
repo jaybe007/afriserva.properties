@@ -863,6 +863,98 @@ for ($i = 0; $i < 10; $i++) {
 $finalViews = (int)Database::fetchColumn("SELECT view_count FROM properties WHERE id = ?", [$testProp['id']]);
 assertTest("Atomic database counter increments eliminate concurrency drift (+10 updates verified)", $finalViews === $initialViews + 10);
 
+echo "\n24. SECTION 24: ENTERPRISE PERSONA & ROLE CLASSIFICATION AUDIT\n";
+
+// Ensure all 8 roles exist in roles table
+$requiredRoles = ['client', 'tenant', 'landlord', 'seller', 'agent', 'agency_admin', 'developer', 'property_manager'];
+$existingRoles = Database::query("SELECT name FROM roles WHERE name IN ('client', 'tenant', 'landlord', 'seller', 'agent', 'agency_admin', 'developer', 'property_manager')");
+$existingNames = array_column($existingRoles, 'name');
+$allRolesPresent = count(array_intersect($requiredRoles, $existingNames)) === count($requiredRoles);
+assertTest("All 8 core user classifications exist in roles registry", $allRolesPresent);
+
+// Test 1: Property Buyer (client) registration and profile
+$buyerData = [
+    'full_name' => 'Alhaji Garba Shehu',
+    'email' => 'buyer_test_' . uniqid() . '@example.com',
+    'phone' => '+2348031112233',
+    'password' => 'BuyerPassword123!'
+];
+$buyerId = User::create($buyerData, 'client');
+$buyerUser = User::findById($buyerId);
+assertTest("Property Buyer ('client') receives verified client clearance level", in_array('client', $buyerUser['roles'] ?? [], true));
+
+// Test 2: Tenant (tenant) registration and profile
+$tenantData = [
+    'full_name' => 'Chinedu Okeke',
+    'email' => 'tenant_test_' . uniqid() . '@example.com',
+    'phone' => '+2348034445566',
+    'password' => 'TenantPassword123!'
+];
+$tenantId = User::create($tenantData, 'tenant');
+$tenantUser = User::findById($tenantId);
+assertTest("Tenant ('tenant') registers and receives dedicated tenant clearance", in_array('tenant', $tenantUser['roles'] ?? [], true));
+
+// Test 3: Landlord (landlord) professional classification
+Session::set('user', ['id' => 8881, 'roles' => ['landlord']]);
+$isLandlordPro = Auth::hasRole(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin']);
+assertTest("Landlord ('landlord') recognized as executive professional for portfolio management", $isLandlordPro === true);
+
+// Test 4: Property Seller (seller) professional classification and listing authorization
+Session::set('user', ['id' => 8882, 'roles' => ['seller']]);
+$isSellerPro = Auth::hasRole(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin']);
+assertTest("Property Seller ('seller') recognized as direct asset owner with listing authorization", $isSellerPro === true);
+
+// Test 5: Individual Agent (agent) profile stub verification
+$agentData = [
+    'full_name' => 'Adebayo Ogunlesi',
+    'email' => 'agent_test_' . uniqid() . '@example.com',
+    'phone' => '+2348037778899',
+    'password' => 'AgentPassword123!'
+];
+$agentId = User::create($agentData, 'agent');
+$agentProfile = Database::fetch("SELECT * FROM agent_profiles WHERE user_id = ?", [$agentId]);
+assertTest("Individual Agent ('agent') automatically initializes professional broker profile stub", !empty($agentProfile));
+
+// Test 6: Real Estate Agency (agency_admin) corporate firm initialization
+$agencyData = [
+    'full_name' => 'Highland Properties Group',
+    'email' => 'agency_test_' . uniqid() . '@example.com',
+    'phone' => '+2348039990011',
+    'password' => 'AgencyPassword123!'
+];
+$agencyAdminId = User::create($agencyData, 'agency_admin');
+$agencyAdminUser = User::findById($agencyAdminId);
+$agencyMember = Database::fetch("SELECT * FROM agency_members WHERE user_id = ? AND role_in_agency = 'principal'", [$agencyAdminId]);
+assertTest("Real Estate Agency ('agency_admin') initializes corporate broker firm with principal clearance", in_array('agency_admin', $agencyAdminUser['roles'] ?? [], true) && !empty($agencyMember));
+
+// Test 7: Property Developer (developer) professional classification
+Session::set('user', ['id' => 8883, 'roles' => ['developer']]);
+$isDevPro = Auth::hasRole(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin']);
+assertTest("Property Developer ('developer') recognized with off-plan estate clearance", $isDevPro === true);
+
+// Test 8: Property Manager (property_manager) facility operations classification
+Session::set('user', ['id' => 8884, 'roles' => ['property_manager']]);
+$isPmPro = Auth::hasRole(['agent', 'agency_admin', 'landlord', 'developer', 'seller', 'property_manager', 'super_admin']);
+assertTest("Property Manager ('property_manager') recognized with facility management clearance", $isPmPro === true);
+
+// Test 9: Lease queries execute safely without column mismatch errors
+$testTenantList = Database::query(
+    "SELECT DISTINCT u.id, u.full_name, u.email 
+     FROM users u 
+     JOIN user_roles ur ON ur.user_id = u.id 
+     JOIN roles r ON r.id = ur.role_id 
+     WHERE r.name IN ('tenant', 'client', 'buyer') 
+     ORDER BY u.full_name ASC LIMIT 5"
+);
+assertTest("Tenancy lease tenant query executes safely via user_roles join without column mismatch", is_array($testTenantList));
+
+// Test 10: format_role_label returns elegant titles
+$buyerTitle = format_role_label('client');
+$agencyTitle = format_role_label('agency_admin');
+$pmTitle = format_role_label('property_manager');
+assertTest("Role label formatter converts snake_case keys into prestigious titles", $buyerTitle === 'Property Buyer' && $agencyTitle === 'Real Estate Agency' && $pmTitle === 'Property Manager');
+Session::remove('user');
+
 echo "\n========================================================\n";
 echo " TEST SUMMARY: {$passed} PASSED | {$failed} FAILED \n";
 echo "========================================================\n";

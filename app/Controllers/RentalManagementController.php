@@ -23,7 +23,8 @@ class RentalManagementController extends Controller
         $slug = $params['slug'] ?? '';
         $property = Property::findBySlug($slug);
 
-        if (!$property || !in_array($property['purpose'], ['rent', 'short_let'], true)) {
+        $transType = $property['transaction_type'] ?? $property['purpose'] ?? '';
+        if (!$property || !in_array($transType, ['rent', 'short_let'], true)) {
             flash('danger', 'This property is not currently accepting tenancy applications.');
             $this->redirect($response, url('properties'));
             return;
@@ -110,7 +111,7 @@ class RentalManagementController extends Controller
         $user = Auth::user();
         $userId = Auth::id();
 
-        if (in_array($user['role'], ['landlord', 'agent', 'agency', 'property_manager', 'super_admin'], true)) {
+        if (Auth::hasRole(['landlord', 'agent', 'agency_admin', 'property_manager', 'developer', 'seller', 'super_admin'])) {
             $applications = RentalApplication::getForLandlord($userId);
             $viewType = 'landlord';
         } else {
@@ -166,12 +167,12 @@ class RentalManagementController extends Controller
         $user = Auth::user();
         $userId = Auth::id();
 
-        if (in_array($user['role'], ['landlord', 'agent', 'agency', 'property_manager', 'super_admin'], true)) {
+        if (Auth::hasRole(['landlord', 'agent', 'agency_admin', 'property_manager', 'developer', 'seller', 'super_admin'])) {
             $leases = Lease::getForLandlord($userId);
             $arrearsSummary = Lease::getArrearsSummary($userId);
             $expiringLeases = Lease::getExpiringLeases($userId, 60);
-            $properties = Database::query("SELECT id, title, price FROM properties WHERE user_id = ? AND purpose IN ('rent', 'short_let')", [$userId]);
-            $tenants = Database::query("SELECT id, full_name, email FROM users WHERE role IN ('tenant', 'buyer', 'client')");
+            $properties = Database::query("SELECT id, title, price FROM properties WHERE user_id = ? AND transaction_type IN ('rent', 'short_let')", [$userId]);
+            $tenants = Database::query("SELECT DISTINCT u.id, u.full_name, u.email FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN roles r ON r.id = ur.role_id WHERE r.name IN ('tenant', 'client', 'buyer') ORDER BY u.full_name ASC");
             $isLandlord = true;
         } else {
             $leases = Lease::getForTenant($userId);
@@ -267,7 +268,7 @@ class RentalManagementController extends Controller
         $user = Auth::user();
         $userId = Auth::id();
 
-        if (in_array($user['role'], ['landlord', 'agent', 'agency', 'property_manager', 'super_admin'], true)) {
+        if (Auth::hasRole(['landlord', 'agent', 'agency_admin', 'property_manager', 'developer', 'seller', 'super_admin'])) {
             $requests = MaintenanceRequest::getForLandlord($userId);
             $isLandlord = true;
         } else {

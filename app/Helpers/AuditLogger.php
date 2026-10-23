@@ -10,6 +10,12 @@ class AuditLogger
     public static function log(string $action, ?string $targetType = null, ?int $targetId = null, ?array $oldValues = null, ?array $newValues = null): void
     {
         $userId = Auth::id();
+        if ($userId) {
+            $userExists = (bool)Database::fetchColumn("SELECT 1 FROM users WHERE id = ? LIMIT 1", [$userId]);
+            if (!$userExists) {
+                $userId = null;
+            }
+        }
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'System';
 
