@@ -27,49 +27,180 @@
     font-weight: 300;
 }
 
-/* Hero Search Box */
+/* Hero Search Box (Nigeria Property Centre Style) */
 .search-box-card {
     background: #FFFFFF;
     border-radius: var(--radius-lg);
-    padding: 24px 32px;
-    max-width: 1040px;
+    padding: 24px 28px;
+    max-width: 1080px;
     margin: 0 auto;
-    box-shadow: var(--shadow-luxury);
+    box-shadow: 0 20px 45px rgba(11, 25, 44, 0.28);
     color: var(--color-text-main);
     text-align: left;
+    border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .search-tabs {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 12px;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .search-tab-btn {
-    background: none;
-    border: none;
+    background: #F1F5F9;
+    border: 1px solid var(--color-border);
+    border-bottom: none;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-secondary);
-    padding: 8px 18px;
-    border-radius: var(--radius-sm);
+    padding: 10px 22px;
+    border-radius: 8px 8px 0 0;
     cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+    position: relative;
+    bottom: -2px;
+}
+
+.search-tab-btn:hover {
+    background: #E2E8F0;
+    color: var(--color-primary);
+}
+
+.search-tab-btn.active {
+    background: var(--color-primary);
+    color: #FFFFFF;
+    border-color: var(--color-primary);
+    border-bottom: 2px solid var(--color-primary);
+    box-shadow: 0 -2px 6px rgba(11, 25, 44, 0.12);
+}
+
+/* Two-Row Search Matrix */
+.search-location-row {
+    margin-bottom: 14px;
+}
+
+.search-location-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-location-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 18px;
+    color: var(--color-accent);
+    pointer-events: none;
+}
+
+.search-location-input {
+    padding-left: 44px !important;
+    height: 50px;
+    font-size: 15px;
+    border-radius: var(--radius-md);
+    border: 2px solid #CBD5E1;
+    font-weight: 500;
+    width: 100%;
+}
+
+.search-location-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(11, 25, 44, 0.08);
+}
+
+.search-filters-matrix {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.search-field-col label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-secondary);
+    margin-bottom: 6px;
+}
+
+.search-field-col .form-control {
+    height: 44px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-sm);
+}
+
+.search-submit-col {
+    min-width: 175px;
+}
+
+.search-submit-col .btn {
+    height: 44px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Hero Quick Searches (Nigeria Property Centre Style) */
+.hero-quick-searches {
+    margin-top: 24px;
+    text-align: center;
+}
+
+.quick-searches-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #CBD5E1;
+    margin-bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-search-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.quick-search-tag {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
     transition: all var(--transition-fast);
 }
 
-.search-tab-btn.active, .search-tab-btn:hover {
-    background: var(--color-primary);
-    color: #FFFFFF;
+.quick-search-tag:hover {
+    background: var(--color-accent);
+    color: var(--color-primary);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.search-inputs-grid {
-    display: grid;
-    grid-template-columns: 2fr 1.2fr 1.2fr 1fr auto;
-    gap: 16px;
-    align-items: end;
+.category-browse-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primary) !important;
+    box-shadow: var(--shadow-card);
 }
+
 
 /* Property Grid & Cards */
 .property-grid {
@@ -359,8 +490,23 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-    .search-inputs-grid {
-        grid-template-columns: 1fr;
+    .search-inputs-grid,
+    .search-filters-matrix {
+        grid-template-columns: 1fr 1fr;
+    }
+    .search-submit-col {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+    .hero-title {
+        font-size: 34px !important;
+    }
+    .search-box-card {
+        padding: 16px 18px;
+    }
+    .search-tab-btn {
+        padding: 8px 14px;
+        font-size: 13px;
     }
     .gallery-grid {
         grid-template-columns: 1fr;

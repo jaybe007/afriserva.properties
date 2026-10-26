@@ -10,37 +10,45 @@
     </div>
 <?php endif; ?>
 
-<!-- 1. Hero Showcase Section -->
+<!-- 1. Hero Showcase Section (Nigeria Property Centre Multi-Tab Style) -->
 <section class="hero-section">
     <div class="container">
-        <span class="badge badge-gold" style="margin-bottom: 20px;">★ Institutional Real Estate Advisory</span>
-        <h1 class="hero-title">Discover Nigeria’s Finest Luxury Residences, Estates & Prime Land</h1>
+        <span class="badge badge-gold" style="margin-bottom: 20px;">★ Institutional Real Estate Advisory & Verified Marketplace</span>
+        <h1 class="hero-title">Property for Sale & Rent in Nigeria</h1>
         <p class="hero-subtitle">
-            Curated, legally verified residential sales, commercial towers, executive short-lets, and off-plan investment opportunities across Lagos, Abuja, and Port Harcourt.
+            Discover verified houses, flats, serviced apartments, lands, and commercial properties for sale and rent from trusted estate agents, developers, and direct owners across Nigeria.
         </p>
 
         <!-- Search Box Card -->
         <div class="search-box-card">
+            <!-- 5 Nigeria Property Centre Style Tabs -->
             <div class="search-tabs">
-                <button type="button" class="search-tab-btn active" data-type="sale">Buy</button>
-                <button type="button" class="search-tab-btn" data-type="rent">Rent</button>
-                <button type="button" class="search-tab-btn" data-type="short_let">Short Lets</button>
+                <button type="button" class="search-tab-btn active" data-type="sale">For Sale</button>
+                <button type="button" class="search-tab-btn" data-type="rent">For Rent</button>
+                <button type="button" class="search-tab-btn" data-type="short_let">Short Let</button>
+                <button type="button" class="search-tab-btn" data-type="land">Land</button>
                 <button type="button" class="search-tab-btn" data-type="commercial">Commercial</button>
-                <button type="button" class="search-tab-btn" data-type="land">Land & Plots</button>
             </div>
 
             <form action="<?= url('properties') ?>" method="GET">
                 <input type="hidden" name="type" id="search-transaction-type" value="sale">
 
-                <div class="search-inputs-grid">
-                    <div>
-                        <label class="form-label">Search Location or Keywords</label>
-                        <input type="text" name="q" class="form-control" placeholder="e.g. Banana Island, Ikoyi, Maitama">
+                <!-- Row 1: Location / Locality Input -->
+                <div class="search-location-row">
+                    <label class="form-label" style="font-weight: 700; color: var(--color-primary); font-size: 13px; margin-bottom: 6px;">
+                        📍 Location, Locality or Landmark
+                    </label>
+                    <div class="search-location-input-wrap">
+                        <span class="search-location-icon">🔍</span>
+                        <input type="text" name="q" id="search-location-input" class="form-control search-location-input" placeholder="Type a state, locality or area (e.g. Lekki, Ikoyi, Maitama, Ikeja, Victoria Island, Ajah)">
                     </div>
+                </div>
 
-                    <div>
-                        <label class="form-label">State / Region</label>
-                        <select name="state" class="form-control">
+                <!-- Row 2: Search Filters Matrix -->
+                <div class="search-filters-matrix">
+                    <div class="search-field-col">
+                        <label>State</label>
+                        <select name="state" id="search-state-select" class="form-control">
                             <option value="">All States</option>
                             <?php foreach ($states as $s): ?>
                                 <option value="<?= $s['id'] ?>"><?= e($s['name']) ?></option>
@@ -48,35 +56,82 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label class="form-label">Property Category</label>
-                        <select name="category" class="form-control">
-                            <option value="">All Categories</option>
+                    <div class="search-field-col">
+                        <label>Property Type</label>
+                        <select name="category" id="search-category-select" class="form-control">
+                            <option value="">All Types</option>
                             <?php foreach ($categories as $cat): ?>
-                                <option value="<?= $cat['id'] ?>"><?= e($cat['name']) ?></option>
+                                <option value="<?= $cat['id'] ?>"><?= e($cat['name']) ?> (<?= $cat['property_count'] ?>)</option>
                             <?php endforeach; ?>
                         </select>
                     </div>
 
-                    <div>
-                        <label class="form-label">Max Price</label>
-                        <select name="max_price" class="form-control">
-                            <option value="">Any Price</option>
+                    <div class="search-field-col" id="search-bedrooms-col">
+                        <label>Bedrooms</label>
+                        <select name="beds" id="search-beds-select" class="form-control">
+                            <option value="">Any Beds</option>
+                            <option value="1">1 Bedroom</option>
+                            <option value="2">2 Bedrooms</option>
+                            <option value="3">3 Bedrooms</option>
+                            <option value="4">4 Bedrooms</option>
+                            <option value="5">5+ Bedrooms</option>
+                        </select>
+                    </div>
+
+                    <div class="search-field-col">
+                        <label>Min Price</label>
+                        <select name="min_price" id="search-min-price-select" class="form-control">
+                            <option value="">Min Price (Any)</option>
+                            <option value="10000000">₦10,000,000</option>
+                            <option value="25000000">₦25,000,000</option>
                             <option value="50000000">₦50,000,000</option>
-                            <option value="200000000">₦200,000,000</option>
+                            <option value="100000000">₦100,000,000</option>
+                            <option value="250000000">₦250,000,000</option>
                             <option value="500000000">₦500,000,000</option>
                             <option value="1000000000">₦1,000,000,000</option>
+                            <option value="2000000000">₦2,000,000,000</option>
+                        </select>
+                    </div>
+
+                    <div class="search-field-col">
+                        <label>Max Price</label>
+                        <select name="max_price" id="search-max-price-select" class="form-control">
+                            <option value="">Max Price (Any)</option>
+                            <option value="30000000">₦30,000,000</option>
+                            <option value="50000000">₦50,000,000</option>
+                            <option value="100000000">₦100,000,000</option>
+                            <option value="250000000">₦250,000,000</option>
+                            <option value="500000000">₦500,000,000</option>
+                            <option value="1000000000">₦1,000,000,000</option>
+                            <option value="2500000000">₦2,500,000,000</option>
                             <option value="5000000000">₦5,000,000,000+</option>
                         </select>
                     </div>
 
-                    <div>
-                        <button type="submit" class="btn btn-accent btn-lg" style="width: 100%;">
+                    <div class="search-field-col search-submit-col">
+                        <button type="submit" class="btn btn-accent btn-lg" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
                             <span>Search</span> 🔍
                         </button>
                     </div>
                 </div>
             </form>
+        </div>
+
+        <!-- Nigeria Property Centre Popular Searches -->
+        <div class="hero-quick-searches">
+            <div class="quick-searches-header">
+                <span>🔥 Popular Searches in Nigeria:</span>
+            </div>
+            <div class="quick-search-tags-container">
+                <a href="<?= url('properties?type=rent&q=Lekki') ?>" class="quick-search-tag">Flats for rent in Lekki</a>
+                <a href="<?= url('properties?type=sale&q=Ikoyi') ?>" class="quick-search-tag">Houses for sale in Ikoyi</a>
+                <a href="<?= url('properties?type=sale&q=Ajah') ?>" class="quick-search-tag">Duplexes in Ajah</a>
+                <a href="<?= url('properties?type=land&q=Ibeju+Lekki') ?>" class="quick-search-tag">Land in Ibeju Lekki</a>
+                <a href="<?= url('properties?type=rent&q=Maitama') ?>" class="quick-search-tag">Apartments in Maitama</a>
+                <a href="<?= url('properties?type=short_let&q=Victoria+Island') ?>" class="quick-search-tag">Short lets in VI</a>
+                <a href="<?= url('properties?type=commercial&q=Ikeja') ?>" class="quick-search-tag">Commercial in Ikeja</a>
+                <a href="<?= url('properties?type=sale&q=Abuja') ?>" class="quick-search-tag">Houses in Abuja</a>
+            </div>
         </div>
     </div>
 </section>
@@ -107,6 +162,67 @@
                 <?= number_format($stats['active_states']) ?> States
             </div>
             <div style="font-size: 13px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Regional Coverage</div>
+        </div>
+    </div>
+</section>
+
+<!-- 2B. Browse Real Estate by Property Type (Nigeria Property Centre Style) -->
+<section class="section" style="background: #FFFFFF; border-bottom: 1px solid var(--color-border); padding: 48px 0;">
+    <div class="container">
+        <div class="section-header" style="margin-bottom: 32px; text-align: center;">
+            <span class="section-tag">Market Categories</span>
+            <h2 class="section-title">Explore Real Estate by Property Type</h2>
+            <p class="section-desc">Quickly browse authenticated residential homes, commercial towers, serviced short-lets, and prime land plots.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+            <div class="category-browse-card" style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all var(--transition-fast);">
+                <div style="font-size: 36px; margin-bottom: 12px;">🏢</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Flats & Apartments</h3>
+                <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Serviced & Unfurnished Units</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <a href="<?= url('properties?type=sale&q=flat') ?>" class="btn btn-outline btn-xs" style="font-size: 11px; padding: 4px 10px;">For Sale</a>
+                    <a href="<?= url('properties?type=rent&q=flat') ?>" class="btn btn-primary btn-xs" style="font-size: 11px; padding: 4px 10px;">For Rent</a>
+                </div>
+            </div>
+
+            <div class="category-browse-card" style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all var(--transition-fast);">
+                <div style="font-size: 36px; margin-bottom: 12px;">🏡</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Houses & Duplexes</h3>
+                <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Detached, Semi-Detached & Terraces</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <a href="<?= url('properties?type=sale&q=duplex') ?>" class="btn btn-outline btn-xs" style="font-size: 11px; padding: 4px 10px;">For Sale</a>
+                    <a href="<?= url('properties?type=rent&q=duplex') ?>" class="btn btn-primary btn-xs" style="font-size: 11px; padding: 4px 10px;">For Rent</a>
+                </div>
+            </div>
+
+            <div class="category-browse-card" style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all var(--transition-fast);">
+                <div style="font-size: 36px; margin-bottom: 12px;">🗺️</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Land & Plots</h3>
+                <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Residential & Commercial Acres</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <a href="<?= url('properties?type=land') ?>" class="btn btn-primary btn-xs" style="font-size: 11px; padding: 4px 10px; width: 100%;">Explore Plots</a>
+                </div>
+            </div>
+
+            <div class="category-browse-card" style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all var(--transition-fast);">
+                <div style="font-size: 36px; margin-bottom: 12px;">🏬</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Commercial Property</h3>
+                <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Offices, Retail Plazas & Warehouses</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <a href="<?= url('properties?type=commercial&action=sale') ?>" class="btn btn-outline btn-xs" style="font-size: 11px; padding: 4px 10px;">For Sale</a>
+                    <a href="<?= url('properties?type=commercial') ?>" class="btn btn-primary btn-xs" style="font-size: 11px; padding: 4px 10px;">For Lease</a>
+                </div>
+            </div>
+
+            <div class="category-browse-card" style="background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; text-align: center; transition: all var(--transition-fast);">
+                <div style="font-size: 36px; margin-bottom: 12px;">✨</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: var(--color-primary); margin-bottom: 6px;">Short-Let Apartments</h3>
+                <div style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 16px;">Executive Daily & Monthly Stays</div>
+                <div style="display: flex; gap: 8px; justify-content: center;">
+                    <a href="<?= url('properties?type=short_let') ?>" class="btn btn-primary btn-xs" style="font-size: 11px; padding: 4px 10px; width: 100%;">Book Stays</a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
