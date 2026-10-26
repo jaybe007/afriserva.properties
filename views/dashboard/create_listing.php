@@ -72,8 +72,9 @@
 
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 16px;">
             <div class="form-group">
-                <label class="form-label">Price (₦ - NGN) *</label>
-                <input type="number" step="1000" name="price" class="form-control" required value="<?= e($input['price'] ?? '') ?>" placeholder="e.g. 350000000">
+                <label class="form-label">Seller Asking Price (₦ - NGN) *</label>
+                <input type="number" step="1000" id="propertyAskingPrice" name="price" class="form-control" required value="<?= e($input['price'] ?? '') ?>" placeholder="e.g. 50000000">
+                <small style="color: var(--color-text-muted);">Enter the exact net asking price you intend to receive for this property asset.</small>
             </div>
 
             <div class="form-group">
@@ -81,6 +82,108 @@
                 <input type="text" name="price_suffix" class="form-control" value="<?= e($input['price_suffix'] ?? '') ?>" placeholder="e.g. / annum, / night, negotiable">
             </div>
         </div>
+
+        <!-- Real-Time Pricing Preview Engine -->
+        <div id="pricingPreviewContainer" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(200, 154, 53, 0.35); border-radius: 10px; padding: 18px; margin: 16px 0 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <h4 style="font-size: 14px; font-weight: 700; color: #FFF; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <span>⚖️</span> Transparent Pricing Engine Preview (Afriserva Commission Plan)
+                </h4>
+                <span style="font-size: 11px; background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                    ₦0 Subscription Fee
+                </span>
+            </div>
+
+            <p style="font-size: 12px; color: #CBD5E1; margin: 0 0 14px; line-height: 1.5;">
+                No subscription fee. Afriserva's applicable commission or pricing adjustment is disclosed before a transaction proceeds. Afriserva manages buyer relationships, verification, and payment escrow coordination.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px;">
+                <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px;">
+                    <span style="font-size: 10px; color: #94A3B8; text-transform: uppercase; display: block;">Your Asking Price</span>
+                    <strong id="previewAskingPrice" style="color: #FFF; font-size: 14px;">₦0.00</strong>
+                </div>
+                <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px;">
+                    <span style="font-size: 10px; color: #94A3B8; text-transform: uppercase; display: block;">Afriserva Commission (<span id="previewCommRate"><?= (float)($pricingSettings['commission_rate'] ?? 5.0) ?></span>%)</span>
+                    <strong id="previewCommAmount" style="color: var(--color-accent); font-size: 14px;">₦0.00</strong>
+                </div>
+                <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 6px;">
+                    <span style="font-size: 10px; color: #94A3B8; text-transform: uppercase; display: block;">Fixed Markup</span>
+                    <strong id="previewFixedMarkup" style="color: #CBD5E1; font-size: 14px;">₦<?= number_format((float)($pricingSettings['fixed_markup'] ?? 0), 2) ?></strong>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px; border-radius: 6px;">
+                    <span style="font-size: 10px; color: #34D399; text-transform: uppercase; display: block; font-weight: 700;">Buyer-Facing Price</span>
+                    <strong id="previewBuyerPrice" style="color: #10B981; font-size: 15px; font-weight: 800;">₦0.00</strong>
+                </div>
+                <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); padding: 10px; border-radius: 6px;">
+                    <span style="font-size: 10px; color: #60A5FA; text-transform: uppercase; display: block; font-weight: 700;">Expected Net Proceeds</span>
+                    <strong id="previewNetProceeds" style="color: #60A5FA; font-size: 15px; font-weight: 800;">₦0.00</strong>
+                </div>
+            </div>
+            <div style="font-size: 11px; color: #64748B;">
+                Basis: <strong><?= e($pricingSettings['commission_basis'] ?? 'added_to_asking') ?></strong>. The calculated buyer-facing price will be published on the live marketplace, and your expected net proceeds are preserved.
+            </div>
+        </div>
+
+        <script>
+        (function() {
+            var rate = <?= (float)($pricingSettings['commission_rate'] ?? 5.0) ?>;
+            var markup = <?= (float)($pricingSettings['fixed_markup'] ?? 0.0) ?>;
+            var mode = "<?= e($pricingSettings['commission_mode'] ?? 'percentage') ?>";
+            var basis = "<?= e($pricingSettings['commission_basis'] ?? 'added_to_asking') ?>";
+
+            function fmt(num) {
+                return '₦' + (num || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+
+            function updatePricing() {
+                var input = document.getElementById('propertyAskingPrice');
+                var asking = parseFloat(input ? input.value : 0) || 0;
+
+                var comm = 0;
+                if ((mode === 'percentage' || mode === 'combined' || mode === 'custom') && rate > 0) {
+                    if (basis === 'percentage_of_buyer_price' && rate < 100) {
+                        var tempBuyer = (asking + (mode === 'combined' ? markup : 0)) / (1 - (rate / 100));
+                        comm = tempBuyer * (rate / 100);
+                    } else {
+                        comm = (asking * rate) / 100;
+                    }
+                }
+
+                var fixedM = (mode === 'markup' || mode === 'combined' || mode === 'custom') ? markup : 0;
+                var buyer = asking;
+                var net = asking;
+
+                if (basis === 'added_to_asking') {
+                    buyer = asking + comm + fixedM;
+                    net = asking;
+                } else if (basis === 'deducted_from_proceeds') {
+                    buyer = asking;
+                    net = Math.max(0, asking - comm - fixedM);
+                } else if (basis === 'percentage_of_buyer_price') {
+                    if (rate < 100) {
+                        buyer = (asking + fixedM) / (1 - (rate / 100));
+                        comm = buyer * (rate / 100);
+                    } else {
+                        buyer = asking + comm + fixedM;
+                    }
+                    net = asking;
+                }
+
+                document.getElementById('previewAskingPrice').textContent = fmt(asking);
+                document.getElementById('previewCommAmount').textContent = fmt(comm);
+                document.getElementById('previewFixedMarkup').textContent = fmt(fixedM);
+                document.getElementById('previewBuyerPrice').textContent = fmt(buyer);
+                document.getElementById('previewNetProceeds').textContent = fmt(net);
+            }
+
+            var pInput = document.getElementById('propertyAskingPrice');
+            if (pInput) {
+                pInput.addEventListener('input', updatePricing);
+                updatePricing();
+            }
+        })();
+        </script>
 
         <!-- 3. Location -->
         <h3 style="font-size: 18px; margin: 32px 0 20px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">

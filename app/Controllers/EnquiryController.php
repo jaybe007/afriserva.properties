@@ -55,6 +55,10 @@ class EnquiryController extends Controller
 
         $userId = Auth::id();
         $input['user_id'] = $userId;
+
+        // Anti-Bypass Protection: Sanitize message to strip raw personal phone numbers or external contact links
+        $input['message'] = \App\Services\AntiBypassFilter::sanitize($input['message']);
+
         $enquiryId = Enquiry::create($input);
 
         // Fetch property title for notifications
@@ -94,6 +98,14 @@ class EnquiryController extends Controller
     {
         $id = (int)($params['id'] ?? 0);
         $agentId = Auth::id();
+
+        // Anti-Bypass Security: Only authorized platform staff (Super Admin, Transaction Officers)
+        // are permitted to view or unlock unmasked buyer contact information.
+        if (!Auth::hasRole(['super_admin', 'transaction_officer', 'finance_admin', 'moderator'])) {
+            flash('danger', 'Access Prohibited: Client personal contact information is protected under the Afriserva Anti-Bypass Policy. All communications must be routed through the Afriserva Transaction Desk.');
+            $this->redirect($response, url('dashboard/enquiries'));
+            return;
+        }
 
         if (Enquiry::unlockContact($id, $agentId)) {
             flash('success', 'Client contact details unlocked successfully.');

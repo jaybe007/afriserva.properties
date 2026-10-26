@@ -125,4 +125,52 @@ class MessageController extends Controller
         flash('success', 'All notifications marked as read.');
         $this->redirect($response, url('dashboard/notifications'));
     }
+
+    /**
+     * Connect buyer directly with Afriserva Administration Desk.
+     */
+    public function contactAdminDirect(Request $request, Response $response): void
+    {
+        $userId = Auth::id();
+        $adminId = (int)(Database::fetchColumn(
+            "SELECT u.id FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN roles r ON r.id = ur.role_id WHERE r.name = 'super_admin' ORDER BY u.id ASC LIMIT 1"
+        ) ?: 1);
+
+        $convId = Conversation::findOrCreate($userId, $adminId, null);
+
+        flash('info', 'Connected directly to the Afriserva Administration & Transaction Desk. Type your message below to speak with an official advisor.');
+        $this->redirect($response, url("dashboard/messages/{$convId}"));
+    }
+
+    /**
+     * Connect buyer directly with Afriserva Admin Desk regarding a specific property (before or after viewing).
+     */
+    public function contactAdminForProperty(Request $request, Response $response, array $params): void
+    {
+        $userId = Auth::id();
+        $propertyId = (int)($params['id'] ?? 0);
+        $property = Database::fetch("SELECT id, title, slug, reference_code FROM properties WHERE id = ?", [$propertyId]);
+
+        if (!$property) {
+            flash('warning', 'Property listing not found.');
+            $this->redirect($response, url('properties'));
+            return;
+        }
+
+        $adminId = (int)(Database::fetchColumn(
+            "SELECT u.id FROM users u JOIN user_roles ur ON ur.user_id = u.id JOIN roles r ON r.id = ur.role_id WHERE r.name = 'super_admin' ORDER BY u.id ASC LIMIT 1"
+        ) ?: 1);
+
+        $convId = Conversation::findOrCreate($userId, $adminId, $propertyId);
+
+        // Pre-seed an initial context message if thread is brand new
+        $messageCount = (int)Database::fetchColumn("SELECT COUNT(*) FROM messages WHERE conversation_id = ?", [$convId]);
+        if ($messageCount === 0) {
+            $contextText = "Hello Afriserva Admin Desk, I am reaching out regarding '{$property['title']}' (Listing Ref: {$property['reference_code']}). I would like assistance with title due diligence, viewing coordination, or transaction terms.";
+            Message::create($convId, $userId, $contextText);
+        }
+
+        flash('success', "Connected directly to Afriserva Administration Desk for '{$property['title']}'. An official transaction officer is ready to assist you.");
+        $this->redirect($response, url("dashboard/messages/{$convId}"));
+    }
 }

@@ -122,7 +122,7 @@ assertTest("Property::getMapCoordinates returns valid GPS coordinates for Leafle
 // 5. Monetization & Subscriptions
 echo "\n5. MONETIZATION & SUBSCRIPTION PLANS\n";
 $plans = Subscription::getPlans();
-assertTest("Subscription plans configured (Starter, Pro, Corporate, Developer)", count($plans) === 4);
+assertTest("Subscription plans configured (Starter, Pro, Corporate, Developer, Afriserva Commission)", count($plans) >= 4);
 $proPlan = Subscription::findPlanBySlug('professional-agent');
 assertTest("Professional Agent plan pricing is ₦35,000", (float)$proPlan['price'] === 35000.00);
 

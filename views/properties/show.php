@@ -350,12 +350,27 @@
                                 📑 Apply for Tenancy (Rental Application)
                             </a>
                         <?php endif; ?>
-                        <a href="<?= url('properties/' . $property['id'] . '/track-lead') ?>" target="_blank" class="btn btn-accent" style="width: 100%;">
-                            💬 Chat on WhatsApp (Verified Lead)
+                        
+                        <!-- Afriserva Managed Purchase / Offer Initiation -->
+                        <form action="<?= url('properties/' . $property['id'] . '/initiate-transaction') ?>" method="POST" style="margin-bottom: 8px;">
+                            <?= csrf_field() ?>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--color-accent); color: #000B1A; font-weight: 700; border: none; padding: 12px;">
+                                🏛️ Proceed with Purchase / Make Offer
+                            </button>
+                        </form>
+
+                        <a href="<?= url('properties/' . $property['id'] . '/contact-admin') ?>" class="btn btn-outline" style="width: 100%; border-color: var(--color-primary); color: var(--color-primary); font-weight: 600;">
+                            🛡️ Message Admin Desk Directly
                         </a>
-                        <button type="button" class="btn btn-primary js-open-viewing-modal" style="width: 100%;">
+                        <button type="button" class="btn btn-outline js-open-viewing-modal" style="width: 100%;">
                             📅 Schedule Inspection Tour
                         </button>
+                        <a href="<?= url('properties/' . $property['id'] . '/track-lead') ?>" target="_blank" class="btn btn-accent" style="width: 100%;">
+                            💬 Chat with Afriserva Concierge (WhatsApp)
+                        </a>
+                        <div style="background: #F8FAFC; border: 1px solid var(--color-border); border-radius: 6px; padding: 10px 12px; font-size: 12px; color: var(--color-text-muted); line-height: 1.4;">
+                            ℹ️ <strong>Direct Admin Coordination:</strong> You can contact the Afriserva Transaction Desk directly before booking an inspection or after viewing to verify title documents, check zoning, or submit an offer.
+                        </div>
                     </div>
 
                     <!-- Enquiry Form -->

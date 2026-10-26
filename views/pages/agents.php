@@ -36,11 +36,11 @@
                 </div>
 
                 <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-                    <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $agent['whatsapp_number'] ?? '2348030000001') ?>" target="_blank" class="btn btn-accent" style="width: 100%;">
-                        💬 WhatsApp Advisor
+                    <a href="<?= url('properties?agent=' . $agent['id']) ?>" class="btn btn-primary" style="width: 100%;">
+                        🏛️ View Portfolio Listings
                     </a>
-                    <a href="tel:<?= e($agent['phone']) ?>" class="btn btn-outline btn-sm" style="width: 100%;">
-                        📞 Call <?= e($agent['phone']) ?>
+                    <a href="<?= url('properties') ?>" class="btn btn-outline btn-sm" style="width: 100%;">
+                        🛡️ Inquire via Afriserva Desk
                     </a>
                 </div>
             </div>

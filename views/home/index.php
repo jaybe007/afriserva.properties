@@ -388,8 +388,8 @@
                     <p style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 20px; line-height: 1.5;">
                         <?= e($agent['specialization'] ?? 'Luxury Real Estate Advisor') ?>
                     </p>
-                    <a href="https://wa.me/<?= preg_replace('/[^0-9]/', '', $agent['whatsapp_number'] ?? '2348030000001') ?>" target="_blank" class="btn btn-outline btn-sm" style="width: 100%;">
-                        💬 Chat via WhatsApp
+                    <a href="<?= url('properties?agent=' . $agent['id']) ?>" class="btn btn-outline btn-sm" style="width: 100%;">
+                        🏛️ View Listings
                     </a>
                 </div>
             <?php endforeach; ?>

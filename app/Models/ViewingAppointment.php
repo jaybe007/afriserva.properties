@@ -34,7 +34,23 @@ class ViewingAppointment
                 WHERE va.agent_id = ?
                 ORDER BY va.appointment_date ASC, va.appointment_time ASC";
 
-        return Database::query($sql, [$agentId]);
+        $rows = Database::query($sql, [$agentId]);
+        return array_map(function($row) {
+            // Anti-Bypass Security: Mask buyer contact info on viewing schedules
+            $email = $row['client_email'] ?? '';
+            $phone = $row['client_phone'] ?? '';
+            $parts = explode('@', $email);
+            $row['client_masked_email'] = (count($parts) === 2) 
+                ? substr($parts[0], 0, 1) . '***@' . $parts[1] 
+                : '***@client.afriserva.com';
+            $row['client_masked_phone'] = (strlen($phone) > 6) 
+                ? substr($phone, 0, 4) . ' *** ' . substr($phone, -3) 
+                : '***-***-****';
+            // Redact raw contact info
+            $row['client_email'] = $row['client_masked_email'];
+            $row['client_phone'] = $row['client_masked_phone'];
+            return $row;
+        }, $rows);
     }
 
     public static function getByUser(int $userId): array

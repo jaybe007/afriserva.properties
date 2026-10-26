@@ -15,8 +15,9 @@ try {
     $sbListings = (int)\App\Core\Database::fetchColumn("SELECT COUNT(*) FROM properties WHERE status = 'pending_review' AND deleted_at IS NULL");
     $sbReports = (int)\App\Core\Database::fetchColumn("SELECT COUNT(*) FROM listing_reports WHERE status = 'pending'");
     $sbDeletions = (int)\App\Core\Database::fetchColumn("SELECT COUNT(*) FROM account_deletion_requests WHERE status = 'pending'");
+    $sbTransactions = (int)\App\Core\Database::fetchColumn("SELECT COUNT(*) FROM property_transactions WHERE stage IN ('enquiry_received', 'under_review', 'payment_evidence_submitted') OR payment_status IN ('evidence_submitted', 'under_verification')");
 } catch (\Exception $e) {
-    $sbVerifications = $sbListings = $sbReports = $sbDeletions = 0;
+    $sbVerifications = $sbListings = $sbReports = $sbDeletions = $sbTransactions = 0;
 }
 $currentUser = \App\Core\Auth::user();
 ?>
@@ -51,6 +52,28 @@ $currentUser = \App\Core\Auth::user();
             <li class="sidebar-item">
                 <a href="<?= url('admin') ?>" class="sidebar-link <?= navIsActive('admin', $currentPath) ?>">
                     <span>⚡</span> System Overview
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="<?= url('admin/transactions') ?>" class="sidebar-link <?= navIsActive('transactions', $currentPath) ?>" style="justify-content: space-between; background: rgba(200, 154, 53, 0.12); border-left: 3px solid var(--color-accent);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span>🏛️</span> Afriserva Transaction Desk
+                    </div>
+                    <?php if ($sbTransactions > 0): ?>
+                        <span class="badge" style="background: #10B981; color: #FFF; font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 700;">
+                            <?= $sbTransactions ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="<?= url('admin/commission-settings') ?>" class="sidebar-link <?= navIsActive('commission-settings', $currentPath) ?>">
+                    <span>💰</span> Commission Plan Engine
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="<?= url('admin/bank-accounts') ?>" class="sidebar-link <?= navIsActive('bank-accounts', $currentPath) ?>">
+                    <span>🏦</span> Receiving Bank Accounts
                 </a>
             </li>
             <li class="sidebar-item">

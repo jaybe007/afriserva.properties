@@ -95,7 +95,24 @@ class Enquiry
                 LIMIT {$limit}";
 
         $rows = Database::query($sql, [$agentId]);
-        return array_map([self::class, 'applyPrivacyMask'], $rows);
+        return array_map(function($row) {
+            // Anti-Bypass Security: Always enforce masked buyer email and phone for agents/sellers regardless of unlocked flag
+            $parts = explode('@', $row['email'] ?? '');
+            $maskedEmail = (count($parts) === 2) 
+                ? substr($parts[0], 0, 1) . '***@' . $parts[1] 
+                : '***@client.afriserva.com';
+            $phone = $row['phone'] ?? '';
+            $maskedPhone = (strlen($phone) > 6) 
+                ? substr($phone, 0, 4) . ' *** ' . substr($phone, -3) 
+                : '***-***-****';
+
+            $row['masked_email'] = $maskedEmail;
+            $row['masked_phone'] = $maskedPhone;
+            $row['email'] = $maskedEmail;
+            $row['phone'] = $maskedPhone;
+            unset($row['raw_email'], $row['raw_phone']);
+            return $row;
+        }, $rows);
     }
 
     public static function getAll(int $limit = 50): array

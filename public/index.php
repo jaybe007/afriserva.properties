@@ -66,7 +66,9 @@ use App\Controllers\StaticPagesController;
 use App\Controllers\MessageController;
 use App\Controllers\RentalManagementController;
 use App\Controllers\SeoController;
+use App\Controllers\TransactionDeskController;
 use App\Middlewares\SecurityHeadersMiddleware;
+use App\Middlewares\TransactionStaffMiddleware;
 
 Session::start();
 SecurityHeadersMiddleware::apply();
@@ -157,6 +159,10 @@ $router->get('/dashboard/viewings', [DashboardController::class, 'viewings'], [A
 $router->post('/dashboard/viewings/{id}/status', [EnquiryController::class, 'updateViewingStatus'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->get('/dashboard/saved', [DashboardController::class, 'savedProperties'], [AuthMiddleware::class]);
 $router->get('/dashboard/subscription', [DashboardController::class, 'subscription'], [AuthMiddleware::class]);
+$router->get('/dashboard/transactions', [TransactionDeskController::class, 'myTransactions'], [AuthMiddleware::class]);
+$router->get('/dashboard/transactions/{id}', [TransactionDeskController::class, 'showTransaction'], [AuthMiddleware::class]);
+$router->post('/dashboard/transactions/{id}/evidence', [TransactionDeskController::class, 'submitEvidence'], [CsrfMiddleware::class, AuthMiddleware::class]);
+$router->post('/properties/{id}/initiate-transaction', [TransactionDeskController::class, 'initiateTransaction'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->get('/dashboard/profile', [DashboardController::class, 'profile'], [AuthMiddleware::class]);
 $router->post('/dashboard/profile', [DashboardController::class, 'profile'], [CsrfMiddleware::class, AuthMiddleware::class]);
 
@@ -167,6 +173,8 @@ $router->post('/dashboard/messages/{id}/send', [MessageController::class, 'send'
 $router->get('/dashboard/notifications', [MessageController::class, 'notifications'], [AuthMiddleware::class]);
 $router->post('/dashboard/notifications/{id}/read', [MessageController::class, 'markNotificationRead'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->post('/dashboard/notifications/mark-all-read', [MessageController::class, 'markAllNotificationsRead'], [CsrfMiddleware::class, AuthMiddleware::class]);
+$router->get('/dashboard/contact-admin', [MessageController::class, 'contactAdminDirect'], [AuthMiddleware::class]);
+$router->get('/properties/{id}/contact-admin', [MessageController::class, 'contactAdminForProperty'], [AuthMiddleware::class]);
 
 // 7. RENTAL & PROPERTY MANAGEMENT MODULE (SECTION 16)
 $router->get('/properties/{slug}/apply', [RentalManagementController::class, 'applyForm']);
@@ -227,6 +235,21 @@ $router->get('/admin/export/users', [AdminController::class, 'exportUsers'], [Ro
 $router->get('/admin/export/listings', [AdminController::class, 'exportListings'], [RoleMiddleware::class]);
 $router->get('/admin/settings', [AdminController::class, 'settings'], [RoleMiddleware::class]);
 $router->post('/admin/settings', [AdminController::class, 'settings'], [CsrfMiddleware::class, RoleMiddleware::class]);
+
+// 10. AFRISERVA TRANSACTION DESK, COMPANY BANK ACCOUNTS & COMMISSION SETTINGS
+$router->get('/admin/transactions', [TransactionDeskController::class, 'index'], [TransactionStaffMiddleware::class]);
+$router->get('/admin/transactions/{id}', [TransactionDeskController::class, 'show'], [TransactionStaffMiddleware::class]);
+$router->post('/admin/transactions/{id}/assign-officer', [TransactionDeskController::class, 'assignOfficer'], [CsrfMiddleware::class, TransactionStaffMiddleware::class]);
+$router->post('/admin/transactions/{id}/stage', [TransactionDeskController::class, 'updateStage'], [CsrfMiddleware::class, TransactionStaffMiddleware::class]);
+$router->post('/admin/transactions/{id}/issue-payment-instructions', [TransactionDeskController::class, 'issuePaymentInstructions'], [CsrfMiddleware::class, TransactionStaffMiddleware::class]);
+$router->post('/admin/transactions/{id}/verify-payment', [TransactionDeskController::class, 'verifyPayment'], [CsrfMiddleware::class, TransactionStaffMiddleware::class]);
+$router->post('/admin/transactions/{id}/settlement', [TransactionDeskController::class, 'recordSettlement'], [CsrfMiddleware::class, TransactionStaffMiddleware::class]);
+$router->get('/admin/bank-accounts', [TransactionDeskController::class, 'bankAccounts'], [RoleMiddleware::class]);
+$router->post('/admin/bank-accounts/store', [TransactionDeskController::class, 'storeBankAccount'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->post('/admin/bank-accounts/{id}/activate', [TransactionDeskController::class, 'activateBankAccount'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->get('/admin/commission-settings', [TransactionDeskController::class, 'commissionSettings'], [RoleMiddleware::class]);
+$router->post('/admin/commission-settings/update', [TransactionDeskController::class, 'updateCommissionSettings'], [CsrfMiddleware::class, RoleMiddleware::class]);
+$router->post('/admin/commission-settings/migrate-users', [TransactionDeskController::class, 'migrateUsersToCommissionPlan'], [CsrfMiddleware::class, RoleMiddleware::class]);
 
 // Dispatch application
 $router->dispatch($request, $response);

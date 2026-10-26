@@ -118,6 +118,7 @@ class Database
                     __DIR__ . '/../../database/010_messaging_monetization_rentals.sql',
                     __DIR__ . '/../../database/011_database_architecture_and_security.sql',
                     __DIR__ . '/../../database/012_notifications_and_seo.sql',
+                    __DIR__ . '/../../database/013_commission_plan_and_transaction_desk.sql',
                 ];
 
                 try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;"); } catch (\Throwable $e) {}
@@ -127,6 +128,17 @@ class Database
                     }
                 }
                 try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); } catch (\Throwable $e) {}
+            }
+
+            // Ensure Migration 013 (Commission Plan and Transaction Desk) is applied
+            $hasTransactions = $pdo->query("SHOW TABLES LIKE 'property_transactions'")->fetch();
+            if (!$hasTransactions) {
+                $file013 = __DIR__ . '/../../database/013_commission_plan_and_transaction_desk.sql';
+                if (file_exists($file013)) {
+                    try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;"); } catch (\Throwable $e) {}
+                    self::executeSqlFile($pdo, $file013);
+                    try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;"); } catch (\Throwable $e) {}
+                }
             }
 
             // 3. Seed baseline records if properties table is empty

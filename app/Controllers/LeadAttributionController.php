@@ -24,32 +24,30 @@ class LeadAttributionController extends Controller
         $userId = Auth::id();
         $ip = $request->ip();
 
-        // Fetch Agent's WhatsApp number
-        $agent = Database::fetch(
-            "SELECT u.phone, ap.whatsapp_number 
-             FROM users u 
-             LEFT JOIN agent_profiles ap ON ap.user_id = u.id 
-             WHERE u.id = ?",
-            [(int)$prop['user_id']]
+        // Anti-Bypass Security: Never route directly to seller/agent private number.
+        // Direct WhatsApp inquiries are routed strictly through the official Afriserva Transaction Desk Concierge.
+        $officialLine = (string)Database::fetchColumn(
+            "SELECT value FROM system_settings WHERE `key` = 'official_whatsapp' OR `key` = 'contact_whatsapp' LIMIT 1"
         );
-
-        $rawPhone = $agent['whatsapp_number'] ?? $agent['phone'] ?? '2348030000001';
-        $phoneDigits = preg_replace('/[^0-9]/', '', $rawPhone);
+        if (empty($officialLine)) {
+            $officialLine = '2348002374737'; // Afriserva Official Concierge Desk
+        }
+        $phoneDigits = preg_replace('/[^0-9]/', '', $officialLine);
 
         // Record lead attribution in database to avoid platform leakage
         Database::execute(
             "INSERT INTO enquiries (property_id, user_id, agent_id, name, email, phone, message, enquiry_type, status, created_at)
-             VALUES (?, ?, ?, 'WhatsApp Visitor', 'unspecified@lead.afriserva.com', ?, ?, 'pricing_inquiry', 'contacted', NOW())",
+             VALUES (?, ?, ?, 'Afriserva Concierge Lead', 'concierge@afriserva.com', ?, ?, 'pricing_inquiry', 'new', NOW())",
             [
                 $propertyId,
                 $userId,
                 (int)$prop['user_id'],
                 $phoneDigits,
-                "Attributed WhatsApp lead generated from IP {$ip} for property Ref: {$prop['reference_code']}"
+                "Attributed concierge lead generated from IP {$ip} for property Ref: {$prop['reference_code']}. Handled by Afriserva Transaction Desk."
             ]
         );
 
-        $text = urlencode("Hello, I am contacting you from Afriserva Real Estate (afriserva.com) regarding your listing: {$prop['title']} (Listing Ref: {$prop['reference_code']}). Is this property still available for inspection?");
+        $text = urlencode("Hello Afriserva Transaction Desk, I am interested in property listing: {$prop['title']} (Listing Ref: {$prop['reference_code']}) on afriserva.com. Please provide verification details and assign an inspection advisor.");
         $whatsappUrl = "https://wa.me/{$phoneDigits}?text={$text}";
 
         $this->redirect($response, $whatsappUrl);

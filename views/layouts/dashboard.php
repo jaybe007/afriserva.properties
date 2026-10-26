@@ -61,6 +61,11 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="<?= url('dashboard/transactions') ?>" class="sidebar-link">
+                        <span>🏛️</span> Transactions & Proceeds
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="<?= url('dashboard/enquiries') ?>" class="sidebar-link">
                         <span>✉️</span> Leads & Enquiries
                     </a>
@@ -106,8 +111,18 @@
                 </li>
             <?php else: ?>
                 <li class="sidebar-item">
+                    <a href="<?= url('dashboard/transactions') ?>" class="sidebar-link">
+                        <span>🏛️</span> My Transactions & Offers
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="<?= url('dashboard/viewings') ?>" class="sidebar-link">
                         <span>📅</span> My Inspection Tours
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="<?= url('dashboard/contact-admin') ?>" class="sidebar-link" style="color: var(--color-accent); font-weight: 600;">
+                        <span>🛡️</span> Contact Admin Desk
                     </a>
                 </li>
                 <?php if (has_role('tenant')): ?>

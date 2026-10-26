@@ -106,7 +106,8 @@ class DashboardController extends Controller
             'states' => $states,
             'categories' => $categories,
             'propertyTypes' => $propertyTypes,
-            'amenities' => $amenities
+            'amenities' => $amenities,
+            'pricingSettings' => \App\Services\PricingEngine::getGlobalSettings()
         ], 'layouts/dashboard');
 
         $response->html($html);
@@ -163,15 +164,23 @@ class DashboardController extends Controller
         $submitAction = $input['submit_action'] ?? 'publish';
         $status = ($submitAction === 'draft') ? 'draft' : 'published';
 
+        $askingPrice = (float)$input['price'];
+        $pricing = \App\Services\PricingEngine::calculate($askingPrice);
+        $buyerPrice = $pricing['buyer_price'];
+
         $sql = "INSERT INTO properties (
             uuid, reference_code, user_id, category_id, property_type_id, title, slug, description,
-            transaction_type, price, price_suffix, currency, country_id, state_id, city_id,
+            transaction_type, price, asking_price, buyer_price, commission_rate, commission_amount,
+            fixed_markup, seller_expected_net, commission_calculation_basis, commission_mode, pricing_rule_snapshot,
+            price_suffix, currency, country_id, state_id, city_id,
             neighbourhood_id, address, is_address_hidden, latitude, longitude, bedrooms, bathrooms, toilets,
             parking_spaces, building_size_sqm, land_size_sqm, furnishing_status, property_condition,
             title_document, status, verification_status, created_at
         ) VALUES (
             ?, ?, ?, ?, ?, ?, ?, ?,
-            ?, ?, ?, 'NGN', 1, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?,
+            ?, 'NGN', 1, ?, ?,
             ?, ?, ?, ?, ?, ?, ?, ?,
             ?, ?, ?, ?, ?,
             ?, ?, 'unverified', NOW()
@@ -187,7 +196,16 @@ class DashboardController extends Controller
             $slug,
             trim($input['description']),
             $input['transaction_type'],
-            (float)$input['price'],
+            $buyerPrice,
+            $askingPrice,
+            $buyerPrice,
+            $pricing['commission_rate'],
+            $pricing['commission_amount'],
+            $pricing['fixed_markup'],
+            $pricing['seller_expected_net'],
+            $pricing['commission_basis'],
+            $pricing['commission_mode'],
+            $pricing['snapshot_json'],
             trim($input['price_suffix'] ?? ''),
             (int)$input['state_id'],
             (int)$input['city_id'],
@@ -296,7 +314,8 @@ class DashboardController extends Controller
             'amenities' => $amenities,
             'duplicateWarnings' => $duplicateWarnings,
             'images' => $images,
-            'videos' => $videos
+            'videos' => $videos,
+            'pricingSettings' => \App\Services\PricingEngine::getGlobalSettings()
         ], 'layouts/dashboard');
 
         $response->html($html);
@@ -315,9 +334,15 @@ class DashboardController extends Controller
         }
 
         $input = $request->all();
+        $askingPrice = (float)$input['price'];
+        $pricing = \App\Services\PricingEngine::calculate($askingPrice);
+        $buyerPrice = $pricing['buyer_price'];
 
         $sql = "UPDATE properties SET
-            title = ?, category_id = ?, property_type_id = ?, description = ?, transaction_type = ?, price = ?, price_suffix = ?,
+            title = ?, category_id = ?, property_type_id = ?, description = ?, transaction_type = ?,
+            price = ?, asking_price = ?, buyer_price = ?, commission_rate = ?, commission_amount = ?,
+            fixed_markup = ?, seller_expected_net = ?, commission_calculation_basis = ?,
+            commission_mode = ?, pricing_rule_snapshot = ?, price_suffix = ?,
             state_id = ?, address = ?, is_address_hidden = ?, bedrooms = ?, bathrooms = ?,
             toilets = ?, parking_spaces = ?, furnishing_status = ?, property_condition = ?,
             title_document = ?, status = ?, updated_at = NOW()
@@ -329,7 +354,16 @@ class DashboardController extends Controller
             (int)($input['property_type_id'] ?? 1),
             trim($input['description']),
             $input['transaction_type'],
-            (float)$input['price'],
+            $buyerPrice,
+            $askingPrice,
+            $buyerPrice,
+            $pricing['commission_rate'],
+            $pricing['commission_amount'],
+            $pricing['fixed_markup'],
+            $pricing['seller_expected_net'],
+            $pricing['commission_basis'],
+            $pricing['commission_mode'],
+            $pricing['snapshot_json'],
             trim($input['price_suffix'] ?? ''),
             (int)$input['state_id'],
             trim($input['address']),
@@ -789,6 +823,14 @@ class DashboardController extends Controller
     public function exportLeads(Request $request, Response $response): void
     {
         $userId = Auth::id();
+        $isStaff = Auth::hasRole(['super_admin', 'transaction_officer', 'finance_admin']);
+
+        if (!$isStaff) {
+            flash('warning', 'Direct client contact list export is restricted under Afriserva Buyer Privacy Protections. Buyer interactions are managed securely through the Afriserva Transaction Desk.');
+            $this->redirect($response, url('dashboard/enquiries'));
+            return;
+        }
+
         $leads = Database::query(
             "SELECT e.id, e.sender_name, e.sender_email, e.sender_phone, e.status, e.message, p.title AS property_title, e.created_at
              FROM enquiries e
@@ -869,11 +911,15 @@ class DashboardController extends Controller
     public function viewings(Request $request, Response $response): void
     {
         $userId = Auth::id();
-        $appointments = ViewingAppointment::getByAgent($userId);
+        $isClient = Auth::hasRole(['client', 'tenant']);
+        $appointments = $isClient 
+            ? ViewingAppointment::getByUser($userId) 
+            : ViewingAppointment::getByAgent($userId);
 
         $html = $this->render('dashboard/viewings', [
             'title' => 'Scheduled Viewings & Inspections | Afriserva Real Estate',
-            'appointments' => $appointments
+            'appointments' => $appointments,
+            'isClient' => $isClient
         ], 'layouts/dashboard');
 
         $response->html($html);

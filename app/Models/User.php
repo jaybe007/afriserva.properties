@@ -88,6 +88,13 @@ class User
             } catch (\Exception $e) {}
         }
 
+        // Automatically assign default commission plan to eligible sellers, agents, and listing owners
+        if (in_array($role, ['seller', 'agent', 'landlord', 'agency_admin', 'developer', 'property_manager'], true)) {
+            try {
+                \App\Models\Subscription::assignDefaultPlan($userId);
+            } catch (\Throwable $e) {}
+        }
+
         \App\Helpers\AuditLogger::log('user_registered', 'user', $userId, null, [
             'role' => $role,
             'ip' => $clientIp,
