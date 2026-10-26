@@ -146,6 +146,7 @@ $router->post('/dashboard/team/invite', [DashboardController::class, 'inviteTeam
 $router->post('/dashboard/team/{id}/remove', [DashboardController::class, 'removeTeamMember'], [CsrfMiddleware::class, AuthMiddleware::class]);
 $router->get('/dashboard/verification', [DashboardController::class, 'verification'], [AuthMiddleware::class]);
 $router->post('/dashboard/verification/upload', [DashboardController::class, 'uploadVerificationDocument'], [CsrfMiddleware::class, AuthMiddleware::class]);
+$router->get('/dashboard/verification/document/{id}', [DashboardController::class, 'downloadVerificationDocument'], [AuthMiddleware::class]);
 $router->get('/dashboard/invoices', [DashboardController::class, 'invoices'], [AuthMiddleware::class]);
 $router->get('/dashboard/export/listings', [DashboardController::class, 'exportListings'], [AuthMiddleware::class]);
 $router->get('/dashboard/export/leads', [DashboardController::class, 'exportLeads'], [AuthMiddleware::class]);

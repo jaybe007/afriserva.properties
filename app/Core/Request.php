@@ -11,6 +11,7 @@ class Request
     private array $body;
     private array $headers;
     private array $files;
+    private array $params = [];
 
     public function __construct()
     {
@@ -108,5 +109,20 @@ class Request
     public function userAgent(): string
     {
         return $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    }
+
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
+    }
+
+    public function param(string $key, mixed $default = null): mixed
+    {
+        return $this->params[$key] ?? $default;
+    }
+
+    public function params(): array
+    {
+        return $this->params;
     }
 }

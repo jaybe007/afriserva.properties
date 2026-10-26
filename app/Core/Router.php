@@ -47,6 +47,7 @@ class Router
             if (preg_match($route['pattern'], $path, $matches)) {
                 // Extract named parameters
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+                $request->setParams($params);
 
                 // Execute middleware pipeline
                 foreach ($route['middlewares'] as $middlewareClass) {

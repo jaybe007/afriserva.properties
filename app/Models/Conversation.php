@@ -34,8 +34,10 @@ class Conversation
     {
         $sql = "SELECT c.*, 
                        p.title AS property_title, p.slug AS property_slug, p.price AS property_price,
-                       u1.full_name AS user_one_name, u1.role AS user_one_role,
-                       u2.full_name AS user_two_name, u2.role AS user_two_role,
+                       u1.full_name AS user_one_name, 
+                       (SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = u1.id LIMIT 1) AS user_one_role,
+                       u2.full_name AS user_two_name, 
+                       (SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = u2.id LIMIT 1) AS user_two_role,
                        (SELECT m.message FROM messages m WHERE m.conversation_id = c.id ORDER BY m.id DESC LIMIT 1) AS last_message_snippet,
                        (SELECT COUNT(*) FROM messages m WHERE m.conversation_id = c.id AND m.is_read = 0 AND m.sender_id != ?) AS unread_count
                 FROM conversations c

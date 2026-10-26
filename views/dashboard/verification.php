@@ -37,7 +37,9 @@
                         <tr>
                             <td>
                                 <strong><?= ucwords(str_replace('_', ' ', $doc['document_type'])) ?></strong><br>
-                                <small style="color: var(--color-text-muted);"><?= e($doc['file_name']) ?></small>
+                                <a href="<?= url('dashboard/verification/document/' . $doc['id']) ?>" target="_blank" style="color: var(--color-primary); font-size: 12px; text-decoration: underline;">
+                                    📄 <?= e($doc['file_name']) ?>
+                                </a>
                             </td>
                             <td><code><?= e($doc['document_number'] ?? 'N/A') ?></code></td>
                             <td>
@@ -63,7 +65,7 @@
             Supported formats: PDF, JPG, PNG (Max 10MB). Stored in encrypted private storage.
         </p>
 
-        <form action="<?= url('dashboard/verification/upload') ?>" method="POST">
+        <form action="<?= url('dashboard/verification/upload') ?>" method="POST" enctype="multipart/form-data">
             <?= csrf_field() ?>
 
             <div class="form-group">
@@ -80,18 +82,13 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Official License / Registration Number</label>
+                <label class="form-label">Official License / Registration Number *</label>
                 <input type="text" name="document_number" class="form-control" placeholder="e.g. LASRERA/IND/2026/0412" required>
             </div>
 
             <div class="form-group">
-                <label class="form-label">Document Scan URL / Storage Path *</label>
-                <input type="text" name="file_path" class="form-control" placeholder="storage/documents/lasrera_cert.pdf" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Friendly File Label</label>
-                <input type="text" name="file_name" class="form-control" placeholder="e.g. LASRERA_Certificate_2026.pdf" required>
+                <label class="form-label">Upload Scan / Certificate (PDF, PNG, JPG - max 10MB) *</label>
+                <input type="file" name="verification_file" class="form-control" accept=".pdf,.png,.jpg,.jpeg" required>
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">

@@ -317,7 +317,7 @@ class DashboardController extends Controller
         $input = $request->all();
 
         $sql = "UPDATE properties SET
-            title = ?, description = ?, transaction_type = ?, price = ?, price_suffix = ?,
+            title = ?, category_id = ?, property_type_id = ?, description = ?, transaction_type = ?, price = ?, price_suffix = ?,
             state_id = ?, address = ?, is_address_hidden = ?, bedrooms = ?, bathrooms = ?,
             toilets = ?, parking_spaces = ?, furnishing_status = ?, property_condition = ?,
             title_document = ?, status = ?, updated_at = NOW()
@@ -325,6 +325,8 @@ class DashboardController extends Controller
 
         Database::execute($sql, [
             trim($input['title']),
+            (int)($input['category_id'] ?? 1),
+            (int)($input['property_type_id'] ?? 1),
             trim($input['description']),
             $input['transaction_type'],
             (float)$input['price'],
@@ -495,8 +497,52 @@ class DashboardController extends Controller
 
         $docType = $input['document_type'] ?? 'lasrera_license';
         $docNumber = trim($input['document_number'] ?? '');
-        $filePath = trim($input['file_path'] ?? '');
-        $fileName = trim($input['file_name'] ?? 'Identity_Credential.pdf');
+        $filePath = '';
+        $fileName = '';
+
+        if (!empty($_FILES['verification_file']) && $_FILES['verification_file']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['verification_file'];
+            $maxBytes = 10 * 1024 * 1024; // 10MB
+            if ($file['size'] > $maxBytes) {
+                flash('danger', 'Uploaded file exceeds the maximum size of 10MB.');
+                $this->redirect($response, url('dashboard/verification'));
+                return;
+            }
+
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['pdf', 'jpg', 'jpeg', 'png'];
+            if (!in_array($ext, $allowedExts)) {
+                flash('danger', 'Invalid file type. Only PDF, JPG, and PNG documents are accepted.');
+                $this->redirect($response, url('dashboard/verification'));
+                return;
+            }
+
+            $baseDir = dirname(__DIR__, 2);
+            $targetDir = $baseDir . '/storage/documents';
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0755, true);
+            }
+
+            $safeFileName = 'id_doc_' . $userId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $destPath = $targetDir . '/' . $safeFileName;
+
+            if (move_uploaded_file($file['tmp_name'], $destPath)) {
+                $filePath = 'storage/documents/' . $safeFileName;
+                $fileName = basename($file['name']);
+            } else {
+                flash('danger', 'Failed to save uploaded document file to secure storage.');
+                $this->redirect($response, url('dashboard/verification'));
+                return;
+            }
+        } elseif (!empty($input['file_path'])) {
+            // Programmatic/test upload
+            $filePath = trim($input['file_path']);
+            $fileName = trim($input['file_name'] ?? basename($filePath));
+        } else {
+            flash('danger', 'Please select a document file to upload.');
+            $this->redirect($response, url('dashboard/verification'));
+            return;
+        }
 
         Database::execute(
             "INSERT INTO identity_verification_documents (user_id, document_type, document_number, file_path, file_name, verification_status, created_at)
@@ -504,13 +550,58 @@ class DashboardController extends Controller
             [$userId, $docType, $docNumber, $filePath, $fileName]
         );
 
-        \App\Helpers\AuditLogger::log('identity_document_submitted', 'identity_verification_document', (int)Database::lastInsertId(), null, [
+        $docId = (int)Database::lastInsertId();
+
+        \App\Helpers\AuditLogger::log('identity_document_submitted', 'identity_verification_document', $docId, null, [
             'type' => $docType,
-            'number' => $docNumber
+            'number' => $docNumber,
+            'file_name' => $fileName
         ]);
 
-        flash('success', 'Compliance credential submitted for legal review.');
+        flash('success', 'Compliance credential submitted successfully for legal due diligence review.');
         $this->redirect($response, url('dashboard/verification'));
+    }
+
+    public function downloadVerificationDocument(Request $request, Response $response, array $params): void
+    {
+        $id = (int)($params['id'] ?? 0);
+        $userId = Auth::id();
+
+        $doc = Database::fetch("SELECT * FROM identity_verification_documents WHERE id = ?", [$id]);
+        if (!$doc) {
+            $response->status(404)->html("<h3>Verification credential not found.</h3>", 404);
+            return;
+        }
+
+        $isOwner = ((int)$doc['user_id'] === (int)$userId);
+        $isAdmin = (function_exists('has_role') && (has_role('super_admin') || has_role('moderator')));
+
+        if (!$isOwner && !$isAdmin) {
+            $response->status(403)->html("<h3>Unauthorized: You do not have permission to view this legal credential.</h3>", 403);
+            return;
+        }
+
+        $baseDir = dirname(__DIR__, 2);
+        $filePath = $doc['file_path'];
+        $fullPath = str_starts_with($filePath, '/') || preg_match('/^[A-Za-z]:/', $filePath)
+            ? $filePath
+            : $baseDir . '/' . ltrim($filePath, '/');
+
+        if (!file_exists($fullPath)) {
+            $response->status(404)->html("<h3>Physical document file not found on secure storage.</h3>", 404);
+            return;
+        }
+
+        $fileName = basename($doc['file_name'] ?: 'Credential.pdf');
+        $mime = mime_content_type($fullPath) ?: 'application/octet-stream';
+
+        header("Content-Type: {$mime}");
+        header("Content-Disposition: inline; filename=\"{$fileName}\"");
+        header("Content-Length: " . filesize($fullPath));
+        header("Cache-Control: private, no-transform, no-store, must-revalidate");
+        header("X-Content-Type-Options: nosniff");
+        readfile($fullPath);
+        exit;
     }
 
     public function updateQuickStatus(Request $request, Response $response, array $params): void
@@ -860,7 +951,7 @@ class DashboardController extends Controller
              JOIN properties p ON p.id = sp.property_id
              LEFT JOIN states s ON s.id = p.state_id
              LEFT JOIN cities c ON c.id = p.city_id
-             LEFT JOIN property_images pi ON pi.property_id = p.id AND pi.is_primary = 1
+             LEFT JOIN property_images pi ON pi.property_id = p.id AND pi.is_cover = 1
              WHERE sp.user_id = ?
              ORDER BY sp.created_at DESC",
             [$userId]

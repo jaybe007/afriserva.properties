@@ -34,3 +34,7 @@ desktop.ini
 # Unit and integration test caches
 .phpunit.result.cache
 /coverage/
+
+# Database dumps and local backups
+database/backup_*.sql
+*.sql.gz

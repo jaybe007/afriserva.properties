@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Request;
 use App\Core\Response;
+use App\Core\Auth;
 use App\Models\Property;
 use App\Models\Location;
 use App\Models\SearchAlert;
@@ -16,9 +17,10 @@ class PropertyController extends Controller
     public function index(Request $request, Response $response): void
     {
         $filters = [
-            'keyword' => $request->query('q'),
+            'keyword' => $request->query('q') ?: $request->query('keyword'),
             'transaction_type' => $request->query('type'),
             'category_id' => $request->query('category'),
+            'property_type_id' => $request->query('property_type_id'),
             'state_id' => $request->query('state'),
             'city_id' => $request->query('city'),
             'neighbourhood_id' => $request->query('neighbourhood'),
@@ -27,6 +29,10 @@ class PropertyController extends Controller
             'min_price' => $request->query('min_price'),
             'max_price' => $request->query('max_price'),
             'furnishing_status' => $request->query('furnishing'),
+            'property_condition' => $request->query('condition'),
+            'title_document' => $request->query('title_doc') ?: $request->query('title_document'),
+            'luxury' => $request->query('luxury'),
+            'featured' => $request->query('featured'),
             'verified' => $request->query('verified'),
             'sort' => $request->query('sort', 'newest')
         ];
@@ -109,12 +115,12 @@ class PropertyController extends Controller
 
     public function reportListing(Request $request, Response $response): void
     {
-        $propertyId = (int)$request->param('id');
+        $propertyId = (int)($request->param('id') ?? $request->input('property_id') ?? $request->input('id') ?? 0);
         $reason = trim($request->input('reason') ?? '');
         $details = trim($request->input('details') ?? '');
-        $userId = \App\Core\Auth::id();
+        $userId = Auth::id();
 
-        if (empty($reason) || empty($details)) {
+        if (empty($reason) || empty($details) || $propertyId <= 0) {
             flash('danger', 'Please provide a valid reason and descriptive details for reporting.');
             $this->redirect($response, $_SERVER['HTTP_REFERER'] ?? url('properties'));
             return;
@@ -176,21 +182,28 @@ class PropertyController extends Controller
             return;
         }
 
-        $propertyId = (int)$request->param('id');
+        $propertyId = (int)($request->param('id') ?? $request->input('id') ?? $request->input('property_id') ?? 0);
         $userId = (int)Auth::id();
 
-        $db = \App\Core\Database::getInstance();
-        $stmt = $db->query("SELECT id FROM saved_properties WHERE user_id = ? AND property_id = ?", [$userId, $propertyId]);
-        $existing = $stmt->fetch();
+        if ($propertyId <= 0) {
+            if ($request->isAjax()) {
+                $this->json($response, ['status' => 'error', 'message' => 'Invalid property ID.'], 400);
+                return;
+            }
+            $this->redirect($response, url('properties'));
+            return;
+        }
+
+        $existing = Database::fetch("SELECT id FROM saved_properties WHERE user_id = ? AND property_id = ?", [$userId, $propertyId]);
 
         if ($existing) {
-            $db->query("DELETE FROM saved_properties WHERE user_id = ? AND property_id = ?", [$userId, $propertyId]);
-            $db->query("UPDATE properties SET favourite_count = GREATEST(0, favourite_count - 1) WHERE id = ?", [$propertyId]);
+            Database::execute("DELETE FROM saved_properties WHERE user_id = ? AND property_id = ?", [$userId, $propertyId]);
+            Database::execute("UPDATE properties SET favourite_count = GREATEST(0, favourite_count - 1) WHERE id = ?", [$propertyId]);
             $saved = false;
             $msg = 'Property removed from your shortlist.';
         } else {
-            $db->query("INSERT INTO saved_properties (user_id, property_id) VALUES (?, ?)", [$userId, $propertyId]);
-            $db->query("UPDATE properties SET favourite_count = favourite_count + 1 WHERE id = ?", [$propertyId]);
+            Database::execute("INSERT INTO saved_properties (user_id, property_id) VALUES (?, ?)", [$userId, $propertyId]);
+            Database::execute("UPDATE properties SET favourite_count = favourite_count + 1 WHERE id = ?", [$propertyId]);
             $saved = true;
             $msg = 'Property saved to your favorites wishlist!';
         }

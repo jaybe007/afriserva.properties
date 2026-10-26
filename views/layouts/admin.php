@@ -1,10 +1,12 @@
 <?php
 $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-function navIsActive(string $segment, string $currentPath): string {
-    if ($segment === 'admin') {
-        return (str_ends_with($currentPath, '/admin') || str_ends_with($currentPath, '/admin/')) ? 'active' : '';
+if (!function_exists('navIsActive')) {
+    function navIsActive(string $segment, string $currentPath): string {
+        if ($segment === 'admin') {
+            return (str_ends_with($currentPath, '/admin') || str_ends_with($currentPath, '/admin/')) ? 'active' : '';
+        }
+        return str_contains($currentPath, '/admin/' . $segment) ? 'active' : '';
     }
-    return str_contains($currentPath, '/admin/' . $segment) ? 'active' : '';
 }
 
 // Live sidebar counters

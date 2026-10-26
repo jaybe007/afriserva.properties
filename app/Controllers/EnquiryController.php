@@ -178,6 +178,20 @@ class EnquiryController extends Controller
             return;
         }
 
+        $userId = Auth::id();
+        $isAgent = ((int)$appt['agent_id'] === (int)$userId);
+        $isClient = ((int)$appt['user_id'] === (int)$userId);
+        $isAdmin = (function_exists('has_role') && (has_role('super_admin') || has_role('moderator')));
+
+        if (!$isAgent && !$isClient && !$isAdmin) {
+            flash('danger', 'Unauthorized: You do not have permission to modify this appointment.');
+            $this->redirect($response, url('dashboard/viewings'));
+            return;
+        }
+
+        // Recipient of notification is the opposite party
+        $recipientId = $isAgent ? (int)$appt['user_id'] : (int)$appt['agent_id'];
+
         if ($status === 'rescheduled' && (!empty($newDate) && !empty($newTime))) {
             Database::execute(
                 "UPDATE viewing_appointments 
@@ -186,9 +200,9 @@ class EnquiryController extends Controller
                 [$newDate, $newTime, $id]
             );
             NotificationService::send(
-                (int)$appt['user_id'],
+                $recipientId,
                 "Viewing Rescheduled",
-                "Your property viewing has been rescheduled to {$newDate} at {$newTime}.",
+                "Property viewing #{$id} has been rescheduled to {$newDate} at {$newTime}.",
                 'viewing',
                 url('dashboard/viewings')
             );
@@ -196,9 +210,9 @@ class EnquiryController extends Controller
         } else {
             ViewingAppointment::updateStatus($id, $status);
             NotificationService::send(
-                (int)$appt['user_id'],
+                $recipientId,
                 "Viewing Status: " . ucfirst($status),
-                "Your property viewing appointment status has been updated to {$status}.",
+                "Property viewing appointment #{$id} status has been updated to {$status}.",
                 'viewing',
                 url('dashboard/viewings')
             );
