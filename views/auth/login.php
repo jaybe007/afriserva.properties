@@ -40,33 +40,47 @@
             </button>
         </form>
 
-        <?php if (getenv('APP_ENV') === 'development' && getenv('SHOW_DEMO_LOGINS') === 'true'): ?>
-        <!-- Fast Demo Persona Login (Development Only) -->
+        <!-- Quick 1-Click Test Persona Logins -->
         <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border);">
-            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted); font-weight: 700; margin-bottom: 12px; text-align: center;">
-                ⚡ Fast Demo Persona Login (Development Only)
+            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-primary); font-weight: 700; margin-bottom: 6px; text-align: center;">
+                🔑 Universal Test Credentials
+            </div>
+            <div style="font-size: 12px; color: var(--color-text-muted); text-align: center; margin-bottom: 12px;">
+                Password for all accounts: <strong style="font-family: monospace; color: var(--color-primary); background: #F1F5F9; padding: 2px 6px; border-radius: 4px;">Password123!</strong>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('alexander.wright@afriserva.com')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('admin@afriserva.com')">
                     👑 Super Admin
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('chioma.okonkwo@prestigeprime.ng')">
-                    🏢 Elite Agent
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('officer@afriserva.com')">
+                    🛡️ Transaction Officer
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('babatunde.balogun@prestigeprime.ng')">
-                    🏛 Agency Principal
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('seller@afriserva.com')">
+                    🏷️ Property Seller
                 </button>
-                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('zainab.aliyu@afriserva.com')">
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('agent@afriserva.com')">
+                    🏢 Licensed Agent
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('buyer@afriserva.com')">
                     👤 Buyer / Client
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('landlord@afriserva.com')">
+                    🏠 Landlord
+                </button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="setDemo('tenant@afriserva.com')">
+                    📑 Tenant
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" style="background: var(--color-primary);" onclick="setDemo('test@afriserva.com')">
+                    ⚡ Master Test (Admin)
                 </button>
             </div>
         </div>
         <script>
         function setDemo(email) {
             document.getElementById('login-email').value = email;
+            document.getElementById('login-password').value = 'Password123!';
         }
         </script>
-        <?php endif; ?>
 
         <div style="text-align: center; margin-top: 24px; font-size: 13px; color: var(--color-text-muted);">
             Don't have an account yet? 
